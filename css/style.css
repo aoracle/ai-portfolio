@@ -402,14 +402,14 @@ section {
 
 .projects-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 20px;
     overflow: visible;
 }
 
 /* Showcase card (for featured projects with preview) */
 .project-card-showcase {
-    grid-column: span 2;
+    grid-column: span 4;
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 32px;
@@ -680,6 +680,16 @@ section {
 }
 
 /* Responsive */
+@media (max-width: 1200px) {
+    .projects-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .project-card-showcase {
+        grid-column: span 3;
+    }
+}
+
 @media (max-width: 1024px) {
     .philosophy-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -687,6 +697,14 @@ section {
 
     .tech-categories {
         grid-template-columns: repeat(2, 1fr);
+    }
+
+    .projects-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .project-card-showcase {
+        grid-column: span 2;
     }
 }
 
@@ -870,18 +888,14 @@ section {
     transform: rotate(45deg);
 }
 
-/* Right column cards: align tooltip to right edge to prevent overflow */
-/* In 2-column grid after showcase, children 3,5,7 are in right column */
-.projects-grid > .project-card:nth-child(3) .tooltip,
-.projects-grid > .project-card:nth-child(5) .tooltip,
-.projects-grid > .project-card:nth-child(7) .tooltip {
+/* Right edge cards: align tooltip to right edge to prevent overflow */
+/* In 4-column grid after showcase, child 5 (WhatsApp) is on right edge */
+.projects-grid > .project-card:nth-child(5) .tooltip {
     left: auto;
     right: 0;
 }
 
-.projects-grid > .project-card:nth-child(3) .tooltip::before,
-.projects-grid > .project-card:nth-child(5) .tooltip::before,
-.projects-grid > .project-card:nth-child(7) .tooltip::before {
+.projects-grid > .project-card:nth-child(5) .tooltip::before {
     left: auto;
     right: 24px;
 }
@@ -893,16 +907,12 @@ section {
     }
 
     /* On mobile (single column), all tooltips align left */
-    .projects-grid > .project-card:nth-child(3) .tooltip,
-    .projects-grid > .project-card:nth-child(5) .tooltip,
-    .projects-grid > .project-card:nth-child(7) .tooltip {
+    .projects-grid > .project-card:nth-child(5) .tooltip {
         left: -20px;
         right: auto;
     }
 
-    .projects-grid > .project-card:nth-child(3) .tooltip::before,
-    .projects-grid > .project-card:nth-child(5) .tooltip::before,
-    .projects-grid > .project-card:nth-child(7) .tooltip::before {
+    .projects-grid > .project-card:nth-child(5) .tooltip::before {
         left: 24px;
         right: auto;
     }
