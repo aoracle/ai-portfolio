@@ -158,9 +158,9 @@ body {
 
 .hero-title {
     font-family: 'Lora', serif;
-    font-size: 72px;
+    font-size: 48px;
     font-weight: 600;
-    letter-spacing: -2px;
+    letter-spacing: -1px;
     background: linear-gradient(to bottom, var(--black), var(--gray-400));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
