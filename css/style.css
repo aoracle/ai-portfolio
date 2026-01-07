@@ -146,13 +146,13 @@ body {
 
 /* Hero Section */
 .hero {
-    min-height: 100vh;
+    min-height: auto;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     text-align: center;
-    padding: 140px 24px 100px;
+    padding: 120px 24px 60px;
     background: var(--bg);
 }
 
@@ -185,7 +185,7 @@ body {
 .hero-cta {
     display: flex;
     gap: 12px;
-    margin-bottom: 80px;
+    margin-bottom: 40px;
 }
 
 .btn {
@@ -247,7 +247,7 @@ body {
 
 /* Section Styles */
 section {
-    padding: 100px 0;
+    padding: 60px 0;
     overflow: visible;
 }
 
