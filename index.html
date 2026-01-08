@@ -135,7 +135,7 @@
                 <!-- Project 2: IceOder.ai -->
                 <div class="project-card-showcase">
                     <div class="showcase-preview">
-                        <img src="images/projects/iceoder-preview.png" alt="IceOder.ai - AI-Powered Productivity Suite" class="showcase-image">
+                        <img src="images/projects/iceoder-preview.png" alt="IceOder.ai - AI-Powered Productivity Suite" class="showcase-image clickable-image" onclick="openLightbox(this.src)">
                     </div>
                     <div class="showcase-content">
                         <div class="project-badge">Desktop App</div>
@@ -433,9 +433,15 @@
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2025 Anand M. Built with first principles.</p>
+            <p>&copy; 2025. Built with first principles.</p>
         </div>
     </footer>
+
+    <!-- Lightbox Modal -->
+    <div id="lightbox" class="lightbox" onclick="closeLightbox()">
+        <span class="lightbox-close">&times;</span>
+        <img id="lightbox-img" class="lightbox-content">
+    </div>
 
     <script src="js/main.js"></script>
 </body>
