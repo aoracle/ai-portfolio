@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DBValidator | AI Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/project-page.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">AI Portfolio</a>
+            <ul class="nav-menu">
+                <li><a href="../index.html#projects">All Projects</a></li>
+                <li><a href="../index.html#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Project Header -->
+    <section class="project-header">
+        <div class="container">
+            <a href="../index.html#projects" class="back-link">&larr; Back to Projects</a>
+            <h1 class="project-page-title">DB Validator</h1>
+            <p class="project-page-tagline">Multi-Platform Database Validation Tool</p>
+            <div class="project-page-badges">
+                <span class="badge">Production</span>
+                <span class="badge">122 Tests</span>
+                <span class="badge">4 Modes</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Project Content -->
+    <section class="project-content">
+        <div class="container">
+            <div class="readme-content">
+                <p class="lead">A lightweight Python-based CLI tool to validate and compare datasets across heterogeneous databases (Oracle, Snowflake, Databricks, PostgreSQL, etc.).</p>
+
+                <p><strong>Developer:</strong> Anand Mahajan (@aoracle)</p>
+
+                <h2>Overview</h2>
+                <p>DB Validator is a comprehensive validation framework designed to validate data migrations and ETL processes across different database platforms. It provides 8 validation points with detailed reporting and supports both single-table and batch validation modes.</p>
+
+                <h2>Why DB Validator?</h2>
+                <ul>
+                    <li><strong>YAML Configuration:</strong> Single config file for all validations - repeatable, version-controlled, production-ready</li>
+                    <li><strong>4 Validation Modes:</strong> Exact Match, Selective, DQ Rules, and Adaptive (for ETL/transformations)</li>
+                    <li><strong>Multi-Platform:</strong> Works with Oracle, Databricks, Snowflake, PostgreSQL, MySQL, and more</li>
+                    <li><strong>CSV-Based:</strong> Phase 1 supports CSV validation (no database connections required)</li>
+                    <li><strong>Database-Native:</strong> Phase 2 supports direct database validation (PostgreSQL, SQLite, Oracle, Databricks)</li>
+                    <li><strong>Python-Native Metadata Extractor:</strong> No Java/JDBC dependencies - pure Python</li>
+                    <li><strong>Comprehensive:</strong> 8 validation points covering schema, counts, dimensions, KPIs, dates, patterns, and sampling</li>
+                    <li><strong>Batch Processing:</strong> Validate all tables in one command</li>
+                    <li><strong>Test Infrastructure:</strong> 122 tests (90 unit + 32 integration) with pytest</li>
+                    <li><strong>Detailed Output:</strong> Console and JSON reports with specific failure details</li>
+                    <li><strong>Cloud-Ready:</strong> Works with AWS RDS, Azure Database, GCP Cloud SQL</li>
+                    <li><strong>Modern:</strong> Python 3, CLI-first, ready for UI integration</li>
+                </ul>
+
+                <h2>Quick Start</h2>
+                <h3>Installation</h3>
+                <pre><code>git clone &lt;repository-url&gt;
+cd dbvalidator
+pip3 install pandas click
+
+# For database validation (optional)
+pip3 install psycopg2  # PostgreSQL</code></pre>
+
+                <h3>YAML-Based Validation (Recommended)</h3>
+                <p>The modern way - Configure once, validate all tables:</p>
+                <pre><code># 1. Create YAML configuration
+cat > config/my_validation.yaml &lt;&lt;EOF
+databases:
+  source:
+    type: postgresql
+    host: localhost
+    database: dbvalidator_source
+  target:
+    type: postgresql
+    host: localhost
+    database: dbvalidator_target
+
+table_pairs:
+  - name: Customer Data
+    source: { table: customers, schema: public }
+    target: { table: customers, schema: public }
+    validation_mode: exact_match
+EOF
+
+# 2. Validate configuration
+python3 code/python/main.py validate-config --config config/my_validation.yaml
+
+# 3. Run all validations
+python3 code/python/main.py run --config config/my_validation.yaml</code></pre>
+
+                <h2>Four Validation Modes</h2>
+                <p>Choose the validation strategy that fits your data migration scenario:</p>
+
+                <div class="mode-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Mode</th>
+                                <th>Row Count</th>
+                                <th>Structure</th>
+                                <th>Use Case</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>1. Exact Match</strong></td>
+                                <td>Same</td>
+                                <td>Same</td>
+                                <td>Exact replication, compliance</td>
+                            </tr>
+                            <tr>
+                                <td><strong>2. Selective Match</strong></td>
+                                <td>Same</td>
+                                <td>Same</td>
+                                <td>Skip audit columns, filter rows</td>
+                            </tr>
+                            <tr>
+                                <td><strong>3. DQ Rules Engine</strong></td>
+                                <td>Same</td>
+                                <td>Same</td>
+                                <td>Handle format differences (case, whitespace)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>4. Adaptive Mode</strong></td>
+                                <td>Different</td>
+                                <td>Different</td>
+                                <td>ETL transformations, aggregations</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p><strong>Status:</strong> All 4 modes are fully implemented and production-ready!</p>
+
+                <h2>Eight Points of Validation</h2>
+                <p>Used by all 4 validation modes above:</p>
+                <ol>
+                    <li><strong>Schema Validation</strong> - Column names, order, and structure comparison</li>
+                    <li><strong>Row Count Validation</strong> - Total record counts with differences</li>
+                    <li><strong>Distinct Count Validation</strong> - Unique value counts per column</li>
+                    <li><strong>Dimension Aggregation</strong> - Group by business dimensions (auto-detected)</li>
+                    <li><strong>KPI Metrics</strong> - SUM, AVG, MIN, MAX, COUNT for numeric columns</li>
+                    <li><strong>Date-Based Validation</strong> - Year/month/day aggregations</li>
+                    <li><strong>Pattern Validation</strong> - Null rates, format patterns, numeric ranges</li>
+                    <li><strong>Data Sampling</strong> - Row-by-row content comparison with configurable sample size</li>
+                </ol>
+
+                <h2>Python-Native Metadata Extractor</h2>
+                <p>Extract table lists and metadata from databases - no Java/JDBC required!</p>
+                <ul>
+                    <li><strong>Pure Python</strong> - Uses native database drivers (psycopg2, sqlite3)</li>
+                    <li><strong>No Java dependencies</strong> - No JVM, no JAR files</li>
+                    <li><strong>Faster & simpler</strong> - Direct database connections</li>
+                    <li><strong>Cloud-ready</strong> - Works with AWS RDS, Azure, GCP out of the box</li>
+                    <li><strong>Pattern filtering</strong> - Inclusion/exclusion wildcards (SALES_*, *_TEMP)</li>
+                    <li><strong>5 CLI commands</strong> - list-schemas, list-tables, extract, compare, columns</li>
+                </ul>
+
+                <h2>Key Capabilities</h2>
+                <ul>
+                    <li><strong>Auto-detection:</strong> Automatically identifies dimension, KPI, and date columns</li>
+                    <li><strong>Configurable:</strong> Sample size, tolerance levels, comparison modes</li>
+                    <li><strong>Detailed Output:</strong> Shows exact differences with column/dimension names</li>
+                    <li><strong>JSON Export:</strong> Full validation results for programmatic consumption</li>
+                    <li><strong>Batch Mode:</strong> Validate entire schemas in one command</li>
+                    <li><strong>Mixed Databases:</strong> Validate across different database types (e.g., Oracle → PostgreSQL)</li>
+                </ul>
+
+                <h2>Project Structure</h2>
+                <pre><code>dbvalidator/
+├── code/
+│   └── python/
+│       ├── main.py                      # CLI entry point
+│       ├── metadata_extractor_cli.py    # Metadata extractor CLI
+│       └── dbvalidator/
+│           ├── config/                  # YAML configuration system
+│           ├── validators/              # 8 validation modules
+│           ├── connectors/              # Database connectors
+│           ├── core/                    # Core utilities
+│           └── utils/                   # Utilities & metadata extractor
+├── config/
+│   ├── examples/                        # 6 production-ready YAML examples
+│   └── *.yaml                           # Configuration files
+├── tests/                               # Test infrastructure (122 tests)
+│   ├── unit/                            # Unit tests (90 tests)
+│   └── integration/                     # Integration tests (32 tests)
+├── demo/                                # Demo dataset (8 tables, ~209K rows)
+└── documentation/                       # User guides</code></pre>
+
+                <h2>Roadmap</h2>
+                <h3>Phase 1: CSV Validation (Complete)</h3>
+                <ul>
+                    <li>All 8 validation points implemented</li>
+                    <li>Single table and batch validation</li>
+                    <li>JSON output support</li>
+                    <li>Demo data generator with 8 tables and ~209K rows</li>
+                </ul>
+
+                <h3>Phase 2: Database Connectivity (In Progress)</h3>
+                <ul>
+                    <li>Python-native metadata extractor</li>
+                    <li>YAML configuration system</li>
+                    <li>All 4 validation modes implemented</li>
+                    <li>122 tests (90 unit + 32 integration)</li>
+                    <li>PostgreSQL, SQLite, Oracle, Databricks connectors</li>
+                </ul>
+
+                <h3>Phase 3: Advanced Features (Planned)</h3>
+                <ul>
+                    <li>HTML/PDF reports</li>
+                    <li>Email notifications</li>
+                    <li>Scheduled validation jobs</li>
+                    <li>Historical trending</li>
+                </ul>
+
+                <h3>Phase 4: UI & AI Integration (Planned)</h3>
+                <ul>
+                    <li>Web dashboard</li>
+                    <li>AI dimension detection</li>
+                    <li>Anomaly detection</li>
+                    <li>Interactive chatbot interface</li>
+                </ul>
+
+                <h2>Tech Stack</h2>
+                <div class="tech-badges">
+                    <span class="tech-badge">Python</span>
+                    <span class="tech-badge">Oracle</span>
+                    <span class="tech-badge">Databricks</span>
+                    <span class="tech-badge">Snowflake</span>
+                    <span class="tech-badge">PostgreSQL</span>
+                    <span class="tech-badge">YAML</span>
+                    <span class="tech-badge">pytest</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025. Built with first principles.</p>
+        </div>
+    </footer>
+</body>
+</html>

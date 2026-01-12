@@ -1,0 +1,210 @@
+/* Project Page Styles */
+
+.project-header {
+    padding: 120px 0 40px;
+    background: var(--bg-secondary);
+}
+
+.back-link {
+    display: inline-block;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 14px;
+    margin-bottom: 20px;
+    transition: color var(--transition);
+}
+
+.back-link:hover {
+    color: var(--text);
+}
+
+.project-page-title {
+    font-family: 'Lora', serif;
+    font-size: 48px;
+    font-weight: 600;
+    letter-spacing: -1px;
+    margin-bottom: 12px;
+    background: linear-gradient(to bottom, var(--black), var(--gray-400));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.project-page-tagline {
+    font-size: 18px;
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+}
+
+.project-page-badges {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.project-page-badges .badge {
+    background: var(--bg);
+    color: var(--text-secondary);
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    border: 1px solid var(--border);
+}
+
+/* README Content */
+.project-content {
+    padding: 60px 0;
+    background: var(--bg);
+}
+
+.readme-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.readme-content .lead {
+    font-size: 18px;
+    color: var(--text);
+    line-height: 1.7;
+    margin-bottom: 24px;
+}
+
+.readme-content h2 {
+    font-family: 'Lora', serif;
+    font-size: 28px;
+    font-weight: 600;
+    margin-top: 48px;
+    margin-bottom: 16px;
+    color: var(--text);
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+}
+
+.readme-content h3 {
+    font-family: 'Lora', serif;
+    font-size: 20px;
+    font-weight: 600;
+    margin-top: 32px;
+    margin-bottom: 12px;
+    color: var(--text);
+}
+
+.readme-content p {
+    color: var(--text-secondary);
+    line-height: 1.7;
+    margin-bottom: 16px;
+}
+
+.readme-content ul,
+.readme-content ol {
+    margin-bottom: 20px;
+    padding-left: 24px;
+}
+
+.readme-content li {
+    color: var(--text-secondary);
+    line-height: 1.7;
+    margin-bottom: 8px;
+}
+
+.readme-content li strong {
+    color: var(--text);
+}
+
+.readme-content pre {
+    background: var(--gray-900);
+    border-radius: var(--radius);
+    padding: 20px;
+    overflow-x: auto;
+    margin-bottom: 20px;
+}
+
+.readme-content code {
+    font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace;
+    font-size: 13px;
+    color: var(--gray-300);
+    line-height: 1.6;
+}
+
+.readme-content p code {
+    background: var(--bg-secondary);
+    color: var(--text);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+/* Table */
+.mode-table {
+    overflow-x: auto;
+    margin-bottom: 20px;
+}
+
+.mode-table table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.mode-table th,
+.mode-table td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+}
+
+.mode-table th {
+    background: var(--bg-secondary);
+    color: var(--text);
+    font-weight: 600;
+}
+
+.mode-table td {
+    color: var(--text-secondary);
+}
+
+.mode-table td strong {
+    color: var(--text);
+}
+
+/* Tech badges in readme */
+.readme-content .tech-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+.readme-content .tech-badge {
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    border: 1px solid var(--border);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .project-page-title {
+        font-size: 32px;
+    }
+
+    .readme-content h2 {
+        font-size: 22px;
+    }
+
+    .readme-content h3 {
+        font-size: 18px;
+    }
+
+    .readme-content pre {
+        padding: 16px;
+    }
+
+    .readme-content code {
+        font-size: 12px;
+    }
+}
