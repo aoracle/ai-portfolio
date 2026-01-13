@@ -834,6 +834,22 @@ section {
     .section-title {
         font-size: 28px;
     }
+
+    /* Mobile button adjustments */
+    .showcase-buttons {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .showcase-buttons .btn-visit-dark,
+    .showcase-buttons .btn-details-dark {
+        text-align: center;
+    }
+
+    .btn-details {
+        display: block;
+        text-align: center;
+    }
 }
 
 /* Tooltips */
