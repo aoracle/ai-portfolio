@@ -584,6 +584,60 @@ section {
     color: var(--accent);
 }
 
+/* View Details button for regular cards */
+.btn-details {
+    display: inline-block;
+    margin-top: 16px;
+    padding: 8px 14px;
+    background: transparent;
+    color: var(--text-secondary);
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 13px;
+    border: 1px solid var(--border);
+    transition: all var(--transition);
+}
+
+.btn-details:hover {
+    background: var(--bg-secondary);
+    color: var(--accent);
+    border-color: var(--accent);
+}
+
+/* View Details button for showcase cards (dark bg) */
+.btn-details-dark {
+    display: inline-block;
+    margin-top: 16px;
+    padding: 8px 14px;
+    background: transparent;
+    color: var(--text-secondary);
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 13px;
+    border: 1px solid var(--border);
+    transition: all var(--transition);
+}
+
+.btn-details-dark:hover {
+    background: var(--bg-tertiary);
+    color: var(--accent);
+    border-color: var(--accent);
+}
+
+/* Showcase buttons container */
+.showcase-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.showcase-buttons .btn-visit-dark,
+.showcase-buttons .btn-details-dark {
+    margin-top: 0;
+}
+
 .btn-visit-dark {
     display: inline-block;
     margin-top: 16px;
