@@ -573,6 +573,17 @@ section {
     color: var(--accent);
 }
 
+/* Project links for regular cards (white bg) */
+.project-link {
+    color: var(--text);
+    text-decoration: none;
+    transition: color var(--transition);
+}
+
+.project-link:hover {
+    color: var(--accent);
+}
+
 .btn-visit-dark {
     display: inline-block;
     margin-top: 16px;

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Clone System | AI Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/project-page.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">AI Portfolio</a>
+            <ul class="nav-menu">
+                <li><a href="../index.html#projects">All Projects</a></li>
+                <li><a href="../index.html#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="project-header">
+        <div class="container">
+            <a href="../index.html#projects" class="back-link">&larr; Back to Projects</a>
+            <h1 class="project-page-title">Shah Rukh Khan Voice Clone</h1>
+            <p class="project-page-tagline">Concatenative Voice Synthesis System</p>
+            <div class="project-page-badges">
+                <span class="badge">Complete</span>
+                <span class="badge">306 Words</span>
+                <span class="badge">48kHz Quality</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="project-content">
+        <div class="container">
+            <div class="readme-content">
+                <p class="lead">A voice cloning system that uses <strong>ONLY</strong> Shah Rukh Khan's actual voice to create new sentences through concatenative synthesis.</p>
+
+                <h2>Key Features</h2>
+                <ul>
+                    <li><strong>Speaker Identification:</strong> Automatically identifies and extracts only SRK's voice from videos</li>
+                    <li><strong>Filters out:</strong> Interviewers, announcers, and other speakers</li>
+                    <li><strong>Pure SRK Voice:</strong> Every word in the library is confirmed to be from Shah Rukh Khan</li>
+                </ul>
+
+                <h2>Quick Start</h2>
+                <pre><code># Create a sentence
+python3 srk_voice_clone.py "i think it is"
+
+# Interactive mode
+python3 srk_voice_clone.py</code></pre>
+
+                <h2>Available Sentences</h2>
+                <p>The system can create sentences like:</p>
+                <ul>
+                    <li>"I think"</li>
+                    <li>"I believe"</li>
+                    <li>"My family"</li>
+                    <li>"My films"</li>
+                    <li>"You know"</li>
+                    <li>"I think it is"</li>
+                    <li>And many more...</li>
+                </ul>
+
+                <h2>How It Works</h2>
+                <ol>
+                    <li><strong>Speaker Identification:</strong> Analyzes transcripts to identify when SRK is speaking</li>
+                    <li><strong>Voice Extraction:</strong> Extracts only segments where SRK is speaking</li>
+                    <li><strong>Word Library:</strong> Builds a library of individual words (306 unique words)</li>
+                    <li><strong>Concatenative Synthesis:</strong> Combines words to create new sentences</li>
+                </ol>
+
+                <h2>Project Structure</h2>
+                <pre><code>voice-clone-1min/
+├── srk_voice_clone.py          # Main interface
+├── speaker_identification.py    # Identifies SRK vs other speakers
+├── extract_srk_only.py         # Extracts only SRK voice
+├── word_library_system/        # Core word library implementation
+├── youtube_processing/         # YouTube download and processing
+├── data/
+│   └── srk/
+│       ├── word_library_srk_only/  # Pure SRK voice library
+│       │   ├── words/             # Individual words (672 files)
+│       │   └── sentences/         # Created sentences
+│       ├── speaker_analysis/      # Speaker identification results
+│       └── youtube_words/         # Downloaded YouTube audio
+└── src/                        # Core audio processing modules</code></pre>
+
+                <h2>Current Library Status</h2>
+                <ul>
+                    <li><strong>306 unique words</strong> (only SRK's voice)</li>
+                    <li><strong>672 word versions</strong> (multiple pronunciations)</li>
+                    <li><strong>Zero contamination</strong> from other speakers</li>
+                </ul>
+
+                <h2>Expanding the Library</h2>
+                <p>To add more SRK words:</p>
+                <ol>
+                    <li>Add YouTube video URLs to processing scripts</li>
+                    <li>Run speaker identification to separate SRK from others</li>
+                    <li>Extract only SRK segments</li>
+                    <li>Add to word library</li>
+                </ol>
+
+                <h2>Audio Quality</h2>
+                <ul>
+                    <li><strong>48kHz sample rate</strong> for natural sound</li>
+                    <li><strong>Proper fade in/out</strong> to prevent clicks</li>
+                    <li><strong>Accurate word boundary detection</strong></li>
+                    <li><strong>Natural spacing</strong> between words</li>
+                </ul>
+
+                <h2>Tech Stack</h2>
+                <div class="tech-badges">
+                    <span class="tech-badge">Python</span>
+                    <span class="tech-badge">Audio Processing</span>
+                    <span class="tech-badge">Speaker ID</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025. Built with first principles.</p>
+        </div>
+    </footer>
+</body>
+</html>

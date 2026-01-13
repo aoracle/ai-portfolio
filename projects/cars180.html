@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cars180 | AI Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/project-page.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">AI Portfolio</a>
+            <ul class="nav-menu">
+                <li><a href="../index.html#projects">All Projects</a></li>
+                <li><a href="../index.html#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="project-header">
+        <div class="container">
+            <a href="../index.html#projects" class="back-link">&larr; Back to Projects</a>
+            <h1 class="project-page-title">Cars180</h1>
+            <p class="project-page-tagline">Every Used Car in India, One Place</p>
+            <div class="project-page-badges">
+                <span class="badge">Live Site</span>
+                <span class="badge">8,840+ Listings</span>
+                <span class="badge">7 Platforms</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="project-content">
+        <div class="container">
+            <div class="readme-content">
+                <p class="lead"><strong>Your Personal Car-Finding Agent</strong> - Find your best deal, effortlessly.</p>
+
+                <h2>Project Overview</h2>
+                <p><strong>Cars180's mission: Show EVERY used car available in India in one place.</strong></p>
+                <p>A buyer should find ANY used car on Cars180 - whether it's on Cars24, OLX, Spinny, CarDekho, CarWale, or in a local dealer's lot that's never been online.</p>
+
+                <h3>Two Sources of Inventory</h3>
+                <div class="mode-table">
+                    <table>
+                        <thead>
+                            <tr><th>Source</th><th>Market Share</th><th>How We Capture</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><strong>Online Platforms</strong></td><td>~20-30%</td><td>Scrapers (Cars24, OLX, Spinny, CarDekho, CarWale)</td></tr>
+                            <tr><td><strong>Offline Dealers</strong></td><td>~70-80%</td><td>Dealer Network & Portal</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>Why Dealer Network is Critical</h3>
+                <p>Most used cars in India sit with local dealers who never list online. Without capturing this offline inventory, any aggregator only shows 20-30% of the market. The dealer network unlocks the remaining 70-80%.</p>
+
+                <h3>Current Focus: Pune</h3>
+                <div class="mode-table">
+                    <table>
+                        <thead><tr><th>Metric</th><th>Status</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Total Dealers in Pune</strong></td><td>~3,500</td></tr>
+                            <tr><td><strong>Dealers in Database</strong></td><td>373+</td></tr>
+                            <tr><td><strong>Online Listings (scraped)</strong></td><td>2,100+</td></tr>
+                            <tr><td><strong>Expansion</strong></td><td>Other cities after funding</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h2>Key Features</h2>
+                <ul>
+                    <li><strong>Price Comparison:</strong> Compare listings from multiple platforms side-by-side</li>
+                    <li><strong>AI Buyer Agent:</strong> Conversational agent that finds cars based on your preferences</li>
+                    <li><strong>Dealer Portal:</strong> Self-service inventory management for activated dealers</li>
+                    <li><strong>Admin Inventory:</strong> Super-dealer portal to manage ALL dealer vehicles</li>
+                    <li><strong>Unbiased:</strong> We show all listings equally. No paid placements</li>
+                    <li><strong>Free:</strong> Price comparison is always free</li>
+                </ul>
+
+                <h2>Architecture Overview</h2>
+                <h3>Clean API Separation</h3>
+                <div class="mode-table">
+                    <table>
+                        <thead><tr><th>Portal</th><th>Login Page</th><th>API File</th><th>Auth</th></tr></thead>
+                        <tbody>
+                            <tr><td>Public Website</td><td>None</td><td>comparison_api.py</td><td>None</td></tr>
+                            <tr><td>Dealer Portal</td><td>dealer-login.html</td><td>dealer_portal_api.py</td><td>Session Token</td></tr>
+                            <tr><td>Site Admin</td><td>admin-login.html</td><td>comparison_api.py</td><td>Basic Auth</td></tr>
+                            <tr><td>Admin Dealer</td><td>dealer-admin-login.html</td><td>admin_api.py</td><td>Basic Auth</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>Centralized Data Tables</h3>
+                <ul>
+                    <li><strong>vehicles:</strong> ALL vehicles (scraped + dealer-uploaded)</li>
+                    <li><strong>dealers:</strong> Dealer accounts with activation status</li>
+                    <li><strong>analytics_events:</strong> User activity tracking</li>
+                </ul>
+
+                <h2>Project Structure</h2>
+                <pre><code>cars180/
+├── backend/               # Python backend
+│   ├── api/
+│   │   ├── comparison_api.py      # Main API + Site Admin endpoints
+│   │   ├── dealer_portal_api.py   # Dealer Portal API
+│   │   └── admin_api.py           # Admin Inventory API
+│   ├── crawlers/         # Platform scrapers (Cars24, OLX, Spinny)
+│   └── utils/            # Utilities (auth, images, conversation)
+├── frontend/             # Web interface
+│   ├── static/           # CSS, JS, Images
+│   ├── index.html        # Homepage
+│   ├── comparison.html   # Comparison grid
+│   └── buyer-agent.html  # AI Agent interface
+├── database/             # SQL schemas
+└── scripts/              # Deployment, monitoring</code></pre>
+
+                <h2>Database Schema</h2>
+                <ul>
+                    <li><strong>vehicles:</strong> 140 columns</li>
+                    <li><strong>dealers:</strong> ~25 columns</li>
+                </ul>
+
+                <h2>Tech Stack</h2>
+                <div class="tech-badges">
+                    <span class="tech-badge">Python</span>
+                    <span class="tech-badge">PostgreSQL</span>
+                    <span class="tech-badge">FastAPI</span>
+                    <span class="tech-badge">React</span>
+                    <span class="tech-badge">OpenAI</span>
+                </div>
+
+                <p style="margin-top: 32px;"><a href="https://cars180.com" target="_blank" class="btn-visit-dark">Visit Live Site &rarr;</a></p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025. Built with first principles.</p>
+        </div>
+    </footer>
+</body>
+</html>

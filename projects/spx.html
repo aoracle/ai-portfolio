@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPX Trading System | AI Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/project-page.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">AI Portfolio</a>
+            <ul class="nav-menu">
+                <li><a href="../index.html#projects">All Projects</a></li>
+                <li><a href="../index.html#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="project-header">
+        <div class="container">
+            <a href="../index.html#projects" class="back-link">&larr; Back to Projects</a>
+            <h1 class="project-page-title">SPX Trading Ecosystem</h1>
+            <p class="project-page-tagline">Real-Time S&P 500 Prediction System</p>
+            <div class="project-page-badges">
+                <span class="badge">90% Accuracy</span>
+                <span class="badge">60s Predictions</span>
+                <span class="badge">Multi-LLM</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="project-content">
+        <div class="container">
+            <div class="readme-content">
+                <p class="lead">A comprehensive, production-ready ecosystem for S&P 500 (SPX) trading analysis, prediction, and automation with 90% accuracy on 20+ point moves.</p>
+
+                <h2>System Overview</h2>
+                <p>This ecosystem combines multiple specialized systems for comprehensive SPX trading:</p>
+
+                <div class="mode-table">
+                    <table>
+                        <thead><tr><th>Module</th><th>Purpose</th><th>Accuracy</th><th>Use Case</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Live Predictor</strong></td><td>Real-time 20+ point move prediction</td><td>90% UP, 84% DOWN</td><td>Entry timing</td></tr>
+                            <tr><td><strong>AI Analyzer</strong></td><td>Multi-timeframe AI analysis</td><td>Advanced insights</td><td>Market understanding</td></tr>
+                            <tr><td><strong>Level Model</strong></td><td>Support/resistance ML prediction</td><td>52-58% directional</td><td>Strategic positioning</td></tr>
+                            <tr><td><strong>Candle Analysis</strong></td><td>Pattern detection & monitoring</td><td>Real-time patterns</td><td>Technical analysis</td></tr>
+                            <tr><td><strong>Options Flow</strong></td><td>SPX options flow tracking</td><td>Flow analysis</td><td>Sentiment analysis</td></tr>
+                            <tr><td><strong>Trading Bots</strong></td><td>Automated strategy execution</td><td>Strategy dependent</td><td>Trade execution</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h2>Core Features</h2>
+
+                <h3>Real-Time Prediction</h3>
+                <ul>
+                    <li><strong>90% accuracy</strong> for SPX UP moves (20+ points)</li>
+                    <li><strong>84% accuracy</strong> for SPX DOWN moves (20+ points)</li>
+                    <li><strong>ThetaTerminal integration</strong> for professional market data</li>
+                    <li><strong>Every 60 seconds</strong> during market hours</li>
+                </ul>
+
+                <h3>AI-Powered Analysis</h3>
+                <ul>
+                    <li><strong>Multi-LLM support:</strong> OpenAI, local models, Ollama</li>
+                    <li><strong>Multi-timeframe:</strong> 1min, 2min, 5min, 11min analysis</li>
+                    <li><strong>Pattern detection:</strong> Shendi, Shepti, Doji, Hammer patterns</li>
+                    <li><strong>Level identification:</strong> Support/resistance, pivot points</li>
+                </ul>
+
+                <h3>Advanced ML Framework</h3>
+                <ul>
+                    <li><strong>Level-based prediction</strong> using support/resistance levels</li>
+                    <li><strong>Market regime detection</strong> (trending, range-bound, volatile)</li>
+                    <li><strong>Triple barrier labeling</strong> preventing lookahead bias</li>
+                    <li><strong>Modular architecture</strong> with apps and packages</li>
+                </ul>
+
+                <h3>Trading Automation</h3>
+                <ul>
+                    <li><strong>Multiple bot strategies:</strong> Spread, EMA, combined strategies</li>
+                    <li><strong>TastyTrade integration</strong> for live trading</li>
+                    <li><strong>Risk management</strong> with confidence thresholds</li>
+                    <li><strong>Real-time monitoring</strong> and performance tracking</li>
+                </ul>
+
+                <h2>Performance</h2>
+
+                <h3>Live Predictor Results</h3>
+                <ul>
+                    <li><strong>UP Moves:</strong> 90% accuracy detecting 20+ point moves</li>
+                    <li><strong>DOWN Moves:</strong> 84% accuracy detecting 20+ point moves</li>
+                    <li><strong>Signal Frequency:</strong> ~5-8% of all predictions during volatile periods</li>
+                    <li><strong>Training Data:</strong> 762 moves from 413K SPX 1-minute bars</li>
+                </ul>
+
+                <h3>System Reliability</h3>
+                <ul>
+                    <li><strong>Real-time processing:</strong> &lt;1 second prediction time</li>
+                    <li><strong>Market hours:</strong> 9:30 AM - 4:00 PM ET operation</li>
+                    <li><strong>Data integrity:</strong> Professional ThetaTerminal feed</li>
+                    <li><strong>Backup systems:</strong> Multiple data sources and fallbacks</li>
+                </ul>
+
+                <h2>Architecture</h2>
+                <pre><code>spx-trading-ecosystem/
+├── prediction/           # Machine learning prediction systems
+│   ├── live_predictor/   # 90% accuracy real-time predictions
+│   ├── ai_analyzer/      # AI-powered multi-timeframe analysis
+│   └── level_model/      # Level-based ML framework
+├── analysis/             # Technical analysis tools
+│   ├── candle_analysis/  # Candlestick pattern detection
+│   └── signal_generation/# Trading signal systems
+├── trading/              # Trading execution systems
+│   ├── bots/            # Automated trading strategies
+│   └── brokers/         # Broker integrations (TastyTrade)
+├── options/              # Options-specific analysis
+│   └── flow_analysis/   # Options flow tracking
+└── core/                # Shared infrastructure</code></pre>
+
+                <h2>Quick Start</h2>
+                <pre><code># Start real-time SPX move prediction (90% accuracy)
+cd prediction/live_predictor
+python3 main.py
+
+# Run AI-powered market analysis
+cd prediction/ai_analyzer
+python3 main.py --live
+
+# Monitor SPX candle patterns in real-time
+cd analysis/candle_analysis
+python3 spx_candle_live_monitor.py</code></pre>
+
+                <h2>Configuration</h2>
+                <pre><code># Prediction thresholds
+prediction:
+  up_signal_threshold: 0.70
+  down_signal_threshold: 0.70
+  update_interval: 60
+
+# Trading settings
+trading:
+  max_position_size: 10000
+  risk_per_trade: 0.02</code></pre>
+
+                <h2>Tech Stack</h2>
+                <div class="tech-badges">
+                    <span class="tech-badge">Python</span>
+                    <span class="tech-badge">ML</span>
+                    <span class="tech-badge">ThetaData</span>
+                    <span class="tech-badge">OpenAI</span>
+                    <span class="tech-badge">TastyTrade</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025. Built with first principles.</p>
+        </div>
+    </footer>
+</body>
+</html>

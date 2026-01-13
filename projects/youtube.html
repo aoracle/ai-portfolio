@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube AI Suite | AI Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/project-page.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">AI Portfolio</a>
+            <ul class="nav-menu">
+                <li><a href="../index.html#projects">All Projects</a></li>
+                <li><a href="../index.html#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="project-header">
+        <div class="container">
+            <a href="../index.html#projects" class="back-link">&larr; Back to Projects</a>
+            <h1 class="project-page-title">YouTube AI Suite (YuBrain)</h1>
+            <p class="project-page-tagline">AI-Powered YouTube Transcript Analyzer</p>
+            <div class="project-page-badges">
+                <span class="badge">Production</span>
+                <span class="badge">GPT-4</span>
+                <span class="badge">Multi-language</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="project-content">
+        <div class="container">
+            <div class="readme-content">
+                <p class="lead">YuBrain is a powerful YouTube transcript analyzer that extracts transcripts from YouTube videos and provides AI-powered summaries and visual word clouds.</p>
+
+                <h2>Features</h2>
+                <ul>
+                    <li><strong>🎥 YouTube Transcript Extraction:</strong> Automatically fetches transcripts from any YouTube video (including auto-generated captions)</li>
+                    <li><strong>🤖 AI-Powered Summaries:</strong> Uses OpenAI's GPT-4o-mini to generate structured, professional summaries</li>
+                    <li><strong>☁️ Word Cloud Visualization:</strong> Creates beautiful word clouds to visualize the most frequent topics</li>
+                    <li><strong>🌐 Multi-language Support:</strong> Works with transcripts in various languages</li>
+                    <li><strong>💨 Fast & Responsive:</strong> Clean, modern UI with real-time processing</li>
+                </ul>
+
+                <h2>Screenshots</h2>
+
+                <h3>Main Interface</h3>
+                <ul>
+                    <li>Clean input field for YouTube URLs</li>
+                    <li>Real-time processing with loading indicators</li>
+                </ul>
+
+                <h3>Results Display</h3>
+                <ul>
+                    <li><strong>AI Summary:</strong> Structured summary with video overview, key topics, tone analysis, and reflections</li>
+                    <li><strong>Word Cloud:</strong> Visual representation of frequently used words</li>
+                    <li><strong>Full Transcript:</strong> Complete transcript with language indicator</li>
+                </ul>
+
+                <h2>Usage</h2>
+                <ol>
+                    <li>Copy any YouTube video URL</li>
+                    <li>Paste it into the input field</li>
+                    <li>Press Enter or click "Analyze"</li>
+                    <li>View the AI summary, word cloud, and full transcript</li>
+                </ol>
+
+                <h2>Installation</h2>
+                <pre><code># Clone the repository
+git clone https://github.com/yourusername/yubrain.git
+cd yubrain
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Set up your OpenAI API key in youtube_processor.py
+
+# Run the application
+python app.py
+
+# Open browser to http://localhost:8080</code></pre>
+
+                <h2>Tech Stack</h2>
+                <ul>
+                    <li><strong>Backend:</strong> Python, Flask</li>
+                    <li><strong>AI:</strong> OpenAI GPT-4o-mini</li>
+                    <li><strong>Transcript API:</strong> youtube-transcript-api</li>
+                    <li><strong>Word Cloud:</strong> wordcloud library</li>
+                    <li><strong>Frontend:</strong> HTML, CSS, JavaScript</li>
+                </ul>
+
+                <h2>Project Structure</h2>
+                <pre><code>yubrain/
+├── app.py                 # Flask application
+├── youtube_processor.py   # Core processing logic
+├── requirements.txt       # Python dependencies
+├── templates/
+│   └── index.html        # Web interface
+└── README.md</code></pre>
+
+                <h2>Future Enhancements</h2>
+                <ul>
+                    <li>Save transcripts to Notion</li>
+                    <li>Export summaries as PDF</li>
+                    <li>Support for playlists</li>
+                    <li>Custom word cloud themes</li>
+                    <li>Translation features</li>
+                    <li>Sentiment analysis</li>
+                </ul>
+
+                <h2>Tech Stack</h2>
+                <div class="tech-badges">
+                    <span class="tech-badge">Python</span>
+                    <span class="tech-badge">Flask</span>
+                    <span class="tech-badge">GPT-4</span>
+                    <span class="tech-badge">YouTube API</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025. Built with first principles.</p>
+        </div>
+    </footer>
+</body>
+</html>

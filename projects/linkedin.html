@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkedIn Job Automation | AI Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/project-page.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">AI Portfolio</a>
+            <ul class="nav-menu">
+                <li><a href="../index.html#projects">All Projects</a></li>
+                <li><a href="../index.html#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="project-header">
+        <div class="container">
+            <a href="../index.html#projects" class="back-link">&larr; Back to Projects</a>
+            <h1 class="project-page-title">LinkedIn Job Automation</h1>
+            <p class="project-page-tagline">AI-Powered Easy Apply System</p>
+            <div class="project-page-badges">
+                <span class="badge">95% Cost Reduction</span>
+                <span class="badge">$0.03/Session</span>
+                <span class="badge">150+ UI Elements</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="project-content">
+        <div class="container">
+            <div class="readme-content">
+                <p class="lead">A unified, AI-powered system that handles the complete LinkedIn Easy Apply workflow - search, click, fill, submit - all in one script.</p>
+
+                <h2>One Script, One Workflow</h2>
+                <p>This is the simplified, unified version that handles the complete LinkedIn Easy Apply workflow.</p>
+
+                <h2>Features</h2>
+                <ul>
+                    <li><strong>Single file</strong> - Everything in one place (<code>linkedin_auto_apply.py</code>)</li>
+                    <li><strong>Persistent login</strong> - Login once, apply many times</li>
+                    <li><strong>AI-powered</strong> - Smart decisions for form filling</li>
+                    <li><strong>Your data built-in</strong> - Phone, email, salary preferences pre-configured</li>
+                    <li><strong>Simple workflow</strong> - Search → Click → Fill → Submit</li>
+                </ul>
+
+                <h2>Usage</h2>
+                <pre><code># Default: Apply to 5 data architect/engineer jobs
+python3 linkedin_auto_apply.py
+
+# Apply to 10 jobs
+python3 linkedin_auto_apply.py --max 10
+
+# Search for specific roles
+python3 linkedin_auto_apply.py --jobs "data architect" "senior data engineer" --max 3</code></pre>
+
+                <h2>How It Works</h2>
+                <ol>
+                    <li><strong>Opens LinkedIn</strong> (uses saved login)</li>
+                    <li><strong>Searches for jobs</strong> (your specified types)</li>
+                    <li><strong>Filters Easy Apply</strong> jobs only</li>
+                    <li><strong>For each job:</strong>
+                        <ul>
+                            <li>Clicks Easy Apply</li>
+                            <li>Takes screenshot</li>
+                            <li>AI analyzes what to do</li>
+                            <li>Fills fields/clicks buttons</li>
+                            <li>Submits application</li>
+                            <li>Moves to next job</li>
+                        </ul>
+                    </li>
+                </ol>
+
+                <h2>Your Profile (Built-in)</h2>
+                <pre><code>"phone": "424-323-9484"
+"email": "aoracle@gmail.com"
+"salary": "170000"
+"location": "Sunnyvale, CA"
+"years": "10"
+"authorized": "Yes"
+"sponsorship": "No"</code></pre>
+
+                <h2>AI Actions</h2>
+                <p>The AI only does 5 things:</p>
+                <ol>
+                    <li><strong>Fill text/number fields</strong></li>
+                    <li><strong>Select radio buttons</strong></li>
+                    <li><strong>Select dropdowns</strong></li>
+                    <li><strong>Click buttons</strong></li>
+                    <li><strong>Scroll if needed</strong></li>
+                </ol>
+
+                <h2>Key Achievements</h2>
+                <ul>
+                    <li><strong>95% Token Reduction:</strong> Smart element targeting reduces AI costs dramatically</li>
+                    <li><strong>$0.03 Per Session:</strong> Incredibly efficient API usage</li>
+                    <li><strong>150+ UI Elements:</strong> Auto-discovered element registry for consistent interaction</li>
+                    <li><strong>Self-Learning:</strong> System improves with each application</li>
+                </ul>
+
+                <h2>Requirements</h2>
+                <pre><code>pip install playwright openai python-dotenv
+playwright install chromium</code></pre>
+
+                <p>Add your OpenAI API key to <code>.env</code>:</p>
+                <pre><code>OPENAI_API_KEY=your_key_here</code></pre>
+
+                <h2>Tech Stack</h2>
+                <div class="tech-badges">
+                    <span class="tech-badge">Python</span>
+                    <span class="tech-badge">Playwright</span>
+                    <span class="tech-badge">OpenAI</span>
+                    <span class="tech-badge">Browser-Use</span>
+                </div>
+
+                <p style="margin-top: 24px;"><em>One script, one workflow, no complexity.</em></p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025. Built with first principles.</p>
+        </div>
+    </footer>
+</body>
+</html>

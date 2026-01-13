@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IceOder.ai | AI Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/project-page.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">AI Portfolio</a>
+            <ul class="nav-menu">
+                <li><a href="../index.html#projects">All Projects</a></li>
+                <li><a href="../index.html#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="project-header">
+        <div class="container">
+            <a href="../index.html#projects" class="back-link">&larr; Back to Projects</a>
+            <h1 class="project-page-title">IceOder.ai</h1>
+            <p class="project-page-tagline">AI-Powered Productivity Suite</p>
+            <div class="project-page-badges">
+                <span class="badge">Desktop App</span>
+                <span class="badge">6 Integrations</span>
+                <span class="badge">Cross-Platform</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="project-content">
+        <div class="container">
+            <div class="readme-content">
+                <p class="lead">A comprehensive AI-powered productivity suite combining screenshot analysis, live transcription, and seamless integrations with your favorite tools. Your one-stop workspace for enhanced productivity and AI assistance.</p>
+
+                <h2>Philosophy</h2>
+                <ul>
+                    <li><strong>Unified Workspace:</strong> One app, multiple powerful integrations</li>
+                    <li><strong>Actually working:</strong> Built on proven patterns from successful projects</li>
+                    <li><strong>Clean architecture:</strong> Easy to understand, maintain, and extend</li>
+                    <li><strong>Cross-platform:</strong> Works on Windows, macOS, and Linux</li>
+                </ul>
+
+                <h2>Features</h2>
+
+                <h3>Screenshot Analysis</h3>
+                <ul>
+                    <li><strong>Cross-platform screenshot capture</strong> with multiple fallback methods</li>
+                    <li><strong>OpenAI GPT-4 Vision integration</strong> for image analysis</li>
+                    <li><strong>Invisible window</strong> that stays hidden during screen sharing</li>
+                    <li><strong>Global keyboard shortcuts</strong> for quick access</li>
+                    <li><strong>Follow-up chat</strong> with conversational AI responses</li>
+                </ul>
+
+                <h3>Live Transcription & Interview Coaching</h3>
+                <ul>
+                    <li><strong>Real-time speech-to-text</strong> with live text display as you speak</li>
+                    <li><strong>Speaker diarization</strong> to distinguish between multiple speakers</li>
+                    <li><strong>Interview coaching</strong> with AI-powered response suggestions</li>
+                    <li><strong>Question detection</strong> for automatic interview scenario recognition</li>
+                    <li><strong>Dedicated transcription window</strong> with auto-scrolling</li>
+                    <li><strong>CSV export</strong> for session analysis</li>
+                </ul>
+
+                <h3>Integrated Productivity Suite</h3>
+
+                <h4>Calendar Integration</h4>
+                <ul>
+                    <li>Google Calendar sync with real-time appointment display</li>
+                    <li>Weekly view showing current and upcoming events</li>
+                    <li>Quick launch from integrated toolbar</li>
+                </ul>
+
+                <h4>Integrated Browser</h4>
+                <ul>
+                    <li>Multi-tab browser within the app</li>
+                    <li>Optimized for productivity - Teams, Gmail, Slack, etc.</li>
+                    <li>Session management with bookmark support</li>
+                </ul>
+
+                <h4>Smart Notes with Notion Integration</h4>
+                <ul>
+                    <li>Beautiful sticky notes interface</li>
+                    <li>Direct Notion saving to your TODO database</li>
+                    <li>Real-time sync with immediate feedback</li>
+                </ul>
+
+                <h4>YouTube Analysis (YuBrain Integration)</h4>
+                <ul>
+                    <li>AI-powered video analysis for any YouTube URL</li>
+                    <li>Full transcript extraction with timestamps</li>
+                    <li>Intelligent summaries and key insights</li>
+                    <li>Word cloud generation and content analysis</li>
+                </ul>
+
+                <h2>5-Icon Toolbar</h2>
+                <div class="mode-table">
+                    <table>
+                        <thead><tr><th>Icon</th><th>Feature</th><th>Description</th></tr></thead>
+                        <tbody>
+                            <tr><td>📅</td><td><strong>Calendar</strong></td><td>View your Google Calendar appointments</td></tr>
+                            <tr><td>🌐</td><td><strong>Browser</strong></td><td>Open integrated multi-tab browser</td></tr>
+                            <tr><td>📋</td><td><strong>Notes</strong></td><td>Create sticky notes saved to Notion</td></tr>
+                            <tr><td>🖥️</td><td><strong>Logs</strong></td><td>View system logs and debug info</td></tr>
+                            <tr><td>🎬</td><td><strong>YouTube</strong></td><td>Analyze YouTube videos with AI</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h2>Keyboard Shortcuts</h2>
+                <div class="mode-table">
+                    <table>
+                        <thead><tr><th>Action</th><th>Shortcut</th></tr></thead>
+                        <tbody>
+                            <tr><td>Take Screenshot</td><td><code>Cmd/Ctrl + H</code></td></tr>
+                            <tr><td>Toggle Window</td><td><code>Cmd/Ctrl + B</code></td></tr>
+                            <tr><td>Open Settings</td><td><code>Cmd/Ctrl + ,</code></td></tr>
+                            <tr><td>Toggle Transcription</td><td><code>Cmd/Ctrl + T</code></td></tr>
+                            <tr><td>Quit Application</td><td><code>Cmd/Ctrl + Q</code></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h2>Project Structure</h2>
+                <pre><code>iceoderai/
+├── electron/                    # Main process (Node.js)
+│   ├── main.ts                 # App entry point + IPC handlers
+│   ├── ScreenshotHelper.ts     # Cross-platform screenshot capture
+│   ├── AIHelper.ts             # OpenAI integration
+│   ├── AudioHelper.ts          # Audio recording & transcription
+│   └── preload.ts              # Secure IPC bridge
+├── src/                        # Renderer process (React)
+│   ├── App.tsx                 # Main application + 5-icon toolbar
+│   └── components/             # UI components
+├── calendar/                   # Google Calendar integration
+└── docs/                       # Documentation</code></pre>
+
+                <h2>What's New in v0.2.0+</h2>
+                <ul>
+                    <li><strong>5-Icon Productivity Toolbar</strong> - Quick access to all features</li>
+                    <li><strong>Google Calendar Integration</strong> - See appointments without switching apps</li>
+                    <li><strong>Integrated Browser</strong> - Multi-tab browsing within the app</li>
+                    <li><strong>Smart Notes + Notion</strong> - Instant note-taking with cloud sync</li>
+                    <li><strong>YouTube AI Analysis</strong> - Extract insights from any video</li>
+                    <li><strong>System Monitoring</strong> - Built-in debug and health monitoring</li>
+                    <li><strong>Conversational AI</strong> - Follow-up questions on screenshot analysis</li>
+                    <li><strong>Enhanced Transcription</strong> - Better accuracy and coaching features</li>
+                </ul>
+
+                <h2>Tech Stack</h2>
+                <div class="tech-badges">
+                    <span class="tech-badge">Electron</span>
+                    <span class="tech-badge">TypeScript</span>
+                    <span class="tech-badge">React</span>
+                    <span class="tech-badge">OpenAI</span>
+                    <span class="tech-badge">Google APIs</span>
+                    <span class="tech-badge">Notion API</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025. Built with first principles.</p>
+        </div>
+    </footer>
+</body>
+</html>
