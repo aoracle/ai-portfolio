@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BAMPFA CMS | AI Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/project-page.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">AI Portfolio</a>
+            <ul class="nav-menu">
+                <li><a href="../index.html#projects">All Projects</a></li>
+                <li><a href="../index.html#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="project-header">
+        <div class="container">
+            <a href="../index.html#projects" class="back-link">&larr; Back to Projects</a>
+            <h1 class="project-page-title">BAMPFA CMS</h1>
+            <p class="project-page-tagline">Database Modernization for Berkeley Art Museum</p>
+            <div class="project-page-badges">
+                <span class="badge">Live</span>
+                <span class="badge">53 Tables</span>
+                <span class="badge">PostgreSQL 16</span>
+                <span class="badge">Flask CMS</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="project-content">
+        <div class="container">
+            <div class="readme-content">
+                <p class="lead"><strong>Berkeley Art Museum and Pacific Film Archive</strong> - Comprehensive database architecture and CMS modernization replacing outdated Drupal 7 system.</p>
+
+                <h2>Project Overview</h2>
+                <p><strong>Mission:</strong> Modernize BAMPFA's website and database infrastructure, eliminating manual workflows and integrating disconnected databases (FileMaker, CollectionSpace/CineFiles, Tessitura) into a unified, scalable system.</p>
+
+                <h3>Current Status: ✅ Phase 4 Complete</h3>
+                <ul>
+                    <li><strong>Database:</strong> PostgreSQL 16 with 53-table optimized schema</li>
+                    <li><strong>Production:</strong> Live at http://134.199.187.48/</li>
+                    <li><strong>Environment:</strong> Digital Ocean (Ubuntu 24.04, 4GB RAM, SFO3)</li>
+                    <li><strong>Schema:</strong> No-migration deployment strategy implemented</li>
+                    <li><strong>Budget:</strong> ~70/100 hours delivered</li>
+                </ul>
+
+                <h2>Key Features Implemented</h2>
+                <ul>
+                    <li>✅ <strong>User Management:</strong> Role-based permissions, Berkeley email integration</li>
+                    <li>✅ <strong>Content Workflows:</strong> Draft → Review → Approved → Published → Archived</li>
+                    <li>✅ <strong>Audit Trails:</strong> Complete change tracking for compliance</li>
+                    <li>✅ <strong>Media Management:</strong> Centralized file handling with metadata</li>
+                    <li>✅ <strong>API-Ready:</strong> RESTful endpoints for CMS integration</li>
+                    <li>✅ <strong>Performance:</strong> Indexed queries, optimized for large datasets</li>
+                    <li>✅ <strong>Alias Support:</strong> Film and person name variations without duplicates</li>
+                </ul>
+
+                <h2>Database Architecture</h2>
+                <p>Hub-and-spoke schema with entity relationships:</p>
+                <pre><code>Exhibition/Film Series (1) → (Many) Events/Screenings
+                     ↓
+Events/Screenings (Many) ← → (Many) Art/Film Objects
+                     ↓
+Person Entities (Many) ← → (Many) All Content Types (with roles)</code></pre>
+
+                <h3>Data Model Diagram</h3>
+                <img src="../images/projects/bampfa-erd.png" alt="BAMPFA Database ERD" style="width: 100%; border-radius: 8px; margin: 20px 0; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+
+                <h2>UI Screenshots</h2>
+                <h3>Dashboard</h3>
+                <img src="../images/projects/bampfa-preview.png" alt="BAMPFA Dashboard" style="width: 100%; border-radius: 8px; margin: 20px 0; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+
+                <h3>Films Management</h3>
+                <img src="../images/projects/bampfa-films.png" alt="BAMPFA Films List" style="width: 100%; border-radius: 8px; margin: 20px 0; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+
+                <h3>Events Management</h3>
+                <img src="../images/projects/bampfa-events.png" alt="BAMPFA Events List" style="width: 100%; border-radius: 8px; margin: 20px 0; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+
+                <h2>Current Database Contents</h2>
+                <div class="mode-table">
+                    <table>
+                        <thead>
+                            <tr><th>Content Type</th><th>Count</th><th>Description</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><strong>Films</strong></td><td>6</td><td>Film screenings with full metadata</td></tr>
+                            <tr><td><strong>Events</strong></td><td>8</td><td>Workshops, tours, performances, community events</td></tr>
+                            <tr><td><strong>Series</strong></td><td>3</td><td>Film series and exhibitions</td></tr>
+                            <tr><td><strong>Persons</strong></td><td>10</td><td>Curators, artists, directors, performers</td></tr>
+                            <tr><td><strong>Bookings</strong></td><td>2</td><td>Venue reservations</td></tr>
+                            <tr><td><strong>Tables</strong></td><td>53</td><td>Optimized schema (31 ERD + 22 operational)</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h2>Technical Architecture</h2>
+                <h3>Stack</h3>
+                <ul>
+                    <li><strong>Backend:</strong> Flask (Python) with Gunicorn</li>
+                    <li><strong>Database:</strong> PostgreSQL 16</li>
+                    <li><strong>Server:</strong> Nginx (reverse proxy)</li>
+                    <li><strong>Hosting:</strong> Digital Ocean (SFO3)</li>
+                    <li><strong>Deployment:</strong> Daily backups enabled</li>
+                </ul>
+
+                <h3>Integration Points</h3>
+                <ul>
+                    <li><strong>FileMaker:</strong> Legacy art collection database</li>
+                    <li><strong>CollectionSpace:</strong> CineFiles film archive</li>
+                    <li><strong>Tessitura:</strong> Ticketing and events system</li>
+                </ul>
+
+                <h2>Project Phases</h2>
+                <div class="mode-table">
+                    <table>
+                        <thead>
+                            <tr><th>Phase</th><th>Status</th><th>Description</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><strong>Phase 1</strong></td><td>✅ Complete</td><td>Database schema design and implementation</td></tr>
+                            <tr><td><strong>Phase 2</strong></td><td>✅ Complete</td><td>Base zero deployment (local + EC2)</td></tr>
+                            <tr><td><strong>Phase 3</strong></td><td>✅ Complete</td><td>CMS integration and UI development</td></tr>
+                            <tr><td><strong>Phase 4</strong></td><td>✅ Complete</td><td>Production deployment to Digital Ocean</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h2>Tech Stack</h2>
+                <div class="tech-badges">
+                    <span class="tech-badge">PostgreSQL 16</span>
+                    <span class="tech-badge">Python</span>
+                    <span class="tech-badge">Flask</span>
+                    <span class="tech-badge">Nginx</span>
+                    <span class="tech-badge">Gunicorn</span>
+                    <span class="tech-badge">Digital Ocean</span>
+                </div>
+
+                <h2>Key Achievements</h2>
+                <ul>
+                    <li>🎯 <strong>Unified 3 Legacy Systems:</strong> FileMaker, CollectionSpace, Tessitura</li>
+                    <li>🚀 <strong>53-Table Schema:</strong> Consolidated from 55 initial tables</li>
+                    <li>⚡ <strong>Performance Optimized:</strong> Indexed queries for large datasets</li>
+                    <li>🔐 <strong>Role-Based Access:</strong> Berkeley email integration</li>
+                    <li>📊 <strong>Complete Audit Trails:</strong> Full change tracking</li>
+                    <li>🎨 <strong>Modern UI:</strong> Clean, intuitive CMS interface</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025. Built with first principles.</p>
+        </div>
+    </footer>
+</body>
+</html>
