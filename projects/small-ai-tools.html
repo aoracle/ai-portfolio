@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Small AI Tools | AI Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/project-page.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">AI Portfolio</a>
+            <ul class="nav-menu">
+                <li><a href="../index.html#projects">All Projects</a></li>
+                <li><a href="../index.html#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="project-header">
+        <div class="container">
+            <a href="../index.html#projects" class="back-link">&larr; Back to Projects</a>
+            <h1 class="project-page-title">Small AI Tools</h1>
+            <p class="project-page-tagline">Six small AI utilities that solve one problem each &mdash; TubeBrain, Moltbot, PDF Form Filler, Defender, WhatsApp Summarizer, and YouTube News Feed.</p>
+            <div class="project-page-badges">
+                <span class="badge">6 Utilities</span>
+                <span class="badge">GPT-4 + Claude</span>
+                <span class="badge">Multi-platform</span>
+                <span class="badge">Single-purpose</span>
+                <span class="badge">~$0.002 / Video</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="project-content">
+        <div class="container">
+            <div class="readme-content">
+
+                <p class="lead">Most of my AI builds aren't unicorns. They're small tools that scratch a specific itch &mdash; a 200-line script, a single prompt, one source and one sink. Six of them, grouped here, share a pattern: read this, summarize that, route the output somewhere useful. None of them try to be a platform. Each one replaced a manual task I was doing three or four times a week, paid for itself in saved time within a month, and then quietly kept running.</p>
+
+                <p>I'm grouping them on one page because the pattern matters more than any individual tool. The pattern is what's portable. Once you internalize "fetch &rarr; summarize &rarr; route," you stop reaching for SaaS subscriptions and start writing a 200-line script that does exactly what you need and nothing else. That's the throughline below.</p>
+
+                <h2>1. TubeBrain &mdash; YouTube Video to AI Summary + Word Cloud</h2>
+
+                <p>TubeBrain takes a YouTube URL, pulls the transcript via <code>youtube-transcript-api</code> (no API key, no quota), pipes it through GPT-4o-mini for a structured summary (overview, key topics, tone, reflections), and renders a word cloud of the most frequent terms. The output lands in a Flask page in under ten seconds for a typical 30-minute video. Cost per video: fractions of a cent.</p>
+
+                <p>I built it because I subscribe to too many long-form podcasts and conference talks. Reading a 300-word summary plus skimming a word cloud tells me in 30 seconds whether the video is worth the hour. The word cloud isn't decorative &mdash; it's a fast pre-filter that catches videos where the title was misleading.</p>
+
+                <pre><code>def get_transcript(video_id, preferred_lang='en'):
+    transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
+    try:
+        transcript = transcript_list.find_manually_created_transcript([preferred_lang])
+    except NoTranscriptFound:
+        transcript = transcript_list.find_generated_transcript([preferred_lang])
+    return TextFormatter().format_transcript(transcript.fetch())
+
+
+def summarize(transcript_text):
+    return openai_client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": SUMMARY_PROMPT},
+            {"role": "user", "content": transcript_text[:12000]},
+        ],
+    ).choices[0].message.content</code></pre>
+
+                <p>The design choice worth calling out: GPT-4o-mini, not GPT-4. For a transcript summary task, the bigger model offers ~5% more nuance at 20x the cost. The smaller model is the right tool, and saying so out loud is part of the discipline.</p>
+
+                <h2>2. Moltbot &mdash; Personal Multi-Channel AI Assistant</h2>
+
+                <p>Moltbot is a personal AI assistant that I run on my own devices and reach over the messaging apps I'm already in &mdash; WhatsApp, Telegram, Slack, Discord, iMessage, Signal, and a WebChat. The gateway is a local Node service. Messages arrive on whatever channel I use, get routed to Claude (with Anthropic OAuth, so it counts against my Pro plan, not a metered API key), and come back on the same channel. From my phone, it feels like texting an assistant. Under the hood it's just a thin control plane around an LLM.</p>
+
+                <p>I built it because every "AI assistant" SaaS wants to live inside its own app. I want the assistant to live in the apps where my conversations already are. The fork I run is configured for my own workspace, my own skills, and my own subscription &mdash; not a shared SaaS multi-tenant.</p>
+
+                <pre><code># Reach the assistant from any connected channel
+moltbot agent --message "Summarize today's pipeline notes" \
+              --thinking high
+
+# Deliver the answer back through WhatsApp / Telegram / Slack /
+# Discord / iMessage / Signal / Matrix / WebChat &mdash;
+# whichever channel the inbound message came from.
+
+# Daemon installs as a launchd / systemd user service so it
+# stays running across reboots without a hosted dependency.
+moltbot onboard --install-daemon</code></pre>
+
+                <p>The design choice: <strong>OAuth-backed model access, not API keys.</strong> Anthropic Pro / Max via OAuth means the assistant uses my existing Claude subscription instead of metering tokens to a separate billing line. For a personal tool I hit dozens of times a day, that flips the unit economics from "watch the meter" to "flat-rate, run it freely."</p>
+
+                <h2>3. PDF Form Filler &mdash; AcroForm-aware PDF Automation</h2>
+
+                <p>A small Python utility that programmatically fills PDF forms. Reads the AcroForm field dictionary out of the source PDF, accepts a Python dict of field-name to value, and writes a filled output. For scanned PDFs without a real form layer (i.e. an image of a form), it falls back to a text-overlay strategy: detect approximate field positions, draw the text on a transparent layer, merge with the original. The end result &mdash; a filled PDF I can sign and email &mdash; without retyping the same vendor/insurance/W-9 information for the tenth time this year.</p>
+
+                <p>I built it because I run a single-member LLC and the same eight or ten fields (legal name, address, EIN, NAICS code, business description, formation state, contract terms) show up on every vendor-onboarding form. The script keeps one canonical JSON of "company facts" and stamps any incoming PDF.</p>
+
+                <pre><code>def fill_pdf_form(input_pdf_path, output_pdf_path, field_data):
+    reader = PdfReader(input_pdf_path)
+    writer = PdfWriter()
+
+    if reader.is_encrypted:
+        return False
+
+    if "/AcroForm" in reader.trailer["/Root"]:
+        writer.append_pages_from_reader(reader)
+        writer.update_page_form_field_values(writer.pages[0], field_data)
+    else:
+        # Scanned form &mdash; fall back to overlay strategy
+        return overlay_text_on_scan(input_pdf_path, output_pdf_path, field_data)
+
+    with open(output_pdf_path, "wb") as f:
+        writer.write(f)
+    return True</code></pre>
+
+                <p>The design choice: <strong>two strategies, one entrypoint.</strong> Roughly 60% of vendor PDFs in the wild are real AcroForms; 40% are scanned images masquerading as forms. The library handles both cleanly behind a single <code>fill_pdf_form()</code> call so the caller doesn't have to care.</p>
+
+                <h2>4. Defender &mdash; Personal Security Sentinel (in progress)</h2>
+
+                <p>Defender is the newest of the six and the smallest scope: a local watchdog for my personal machines that surfaces anomalies I'd otherwise have to remember to check &mdash; unexpected outbound connections, new launch agents, large unrecognized writes, expired certificates, and Tailscale peers I don't recognize. Output is a daily report into my notes pipeline, not a real-time alerter. The goal is hygiene, not paging.</p>
+
+                <p>I started this one because, as my system has grown across four machines plus a public droplet, I noticed I was relying on "I'll notice if something's weird" as my security model. That's not a security model. Defender takes the regular checks I was doing ad-hoc and runs them on a schedule.</p>
+
+                <pre><code># Pattern: daily hygiene scan, output to notes pipeline
+# (Same routing the rest of my tools use: Markdown into a
+# project folder, picked up by the next cron.)
+
+def run_daily_scan(out_path):
+    findings = []
+    findings += check_new_launch_agents(since=yesterday())
+    findings += check_outbound_connections(suspicious_only=True)
+    findings += check_tailscale_peer_set(known=KNOWN_PEERS)
+    findings += check_cert_expiry(domains=MY_DOMAINS, window_days=30)
+    findings += check_unrecognized_login_items()
+
+    write_markdown_report(out_path, findings)
+    # The notes-processor cron will route, summarize, and surface
+    # anything urgent on my dashboard tomorrow morning.</code></pre>
+
+                <p>The design choice: <strong>daily digest, not real-time alerts.</strong> Real-time monitoring is a full-time project and a noisy one. A once-a-day Markdown report is enough to catch slow problems &mdash; the kind that actually bite &mdash; while keeping the build at "weekend project" scope.</p>
+
+                <h2>5. WhatsApp Group Summarizer &mdash; Three-Agent Capture Pipeline</h2>
+
+                <p>WhatsApp Web doesn't expose an API. The summarizer works around that with three cooperating agents driven by Playwright. Agent 1 opens WhatsApp Web in a persistent browser profile (so the QR pairing survives), finds the target group, and handles scrolling history. Agent 2 takes synchronized screenshots as the chat scrolls. Agent 3 streams each screenshot to GPT-4 Vision in real time, extracting structured messages (sender, timestamp, text). At the end of the run, all extracted messages are merged and re-summarized into a single digest per group. Sub-minute end-to-end for a group with ~13 screenshots of history.</p>
+
+                <p>I built it because I'm in a half-dozen alumni and family WhatsApp groups where 200 unread messages a day is normal and 95% of them aren't worth reading. I'd rather get one paragraph per group, daily.</p>
+
+                <pre><code>async def analyze_screenshot(self, screenshot_path):
+    with open(screenshot_path, 'rb') as f:
+        image_data = f.read()
+    base64_image = base64.b64encode(image_data).decode('utf-8')
+
+    response = self.client.chat.completions.create(
+        model=self.model,
+        messages=[
+            {
+                "role": "system",
+                "content": (
+                    "Extract ALL visible TEXT messages with exact timestamps, "
+                    "sender names, and message content. IGNORE media. "
+                    "Return structured JSON."
+                ),
+            },
+            {
+                "role": "user",
+                "content": [{
+                    "type": "image_url",
+                    "image_url": {"url": f"data:image/png;base64,{base64_image}"},
+                }],
+            },
+        ],
+    )
+    return json.loads(response.choices[0].message.content)</code></pre>
+
+                <p>The design choice: <strong>OCR via Vision, not a real DOM scrape.</strong> WhatsApp's web client is heavily obfuscated and the message DOM mutates aggressively as you scroll. Capturing pixels and asking GPT-4 Vision to extract structured text is brittle in different ways than DOM scraping, but it ports across UI refreshes for free and doesn't get broken by their next release.</p>
+
+                <h2>6. YouTube News Feed &mdash; Subscriptions as a Curated Digest</h2>
+
+                <p>YouTube's homepage is an algorithmic distraction engine. The News Feed inverts it: log in with Google OAuth, the app pulls the channels I actually subscribe to, hits each channel's RSS endpoint (no API quota), and renders new uploads as a clean feed &mdash; table or card view, filters by language and channel, sort by date or views. Click a video and an on-demand panel generates a 300-word structured summary, sentiment, discussion questions, and action items using GPT-3.5-turbo. At roughly $0.002 per video, I can summarize a week of subscriptions for the price of a coffee.</p>
+
+                <p>I built it because I was paying YouTube Premium and still hated the homepage. I wanted a deterministic, chronological feed of <em>my</em> channels, with AI summaries available on click instead of having to actually watch.</p>
+
+                <pre><code># RSS path &mdash; no YouTube Data API quota required
+def fetch_channel_uploads(channel_id):
+    rss_url = f"https://www.youtube.com/feeds/videos.xml?channel_id={channel_id}"
+    feed = feedparser.parse(rss_url)
+    return [
+        {
+            "video_id":   entry.yt_videoid,
+            "title":      entry.title,
+            "channel":    entry.author,
+            "published":  entry.published,
+            "thumbnail":  entry.media_thumbnail[0]["url"],
+        }
+        for entry in feed.entries
+    ]
+
+
+# Summaries are on-demand &mdash; only pay when I click
+def summarize_on_click(video_id):
+    transcript = get_video_transcript(video_id)
+    if not transcript:
+        return {"status": "no_transcript"}
+    return openai_client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": SUMMARY_PROMPT},
+            {"role": "user", "content": transcript[:12000]},
+        ],
+    ).choices[0].message.content</code></pre>
+
+                <p>The design choice: <strong>RSS for discovery, AI for explanation.</strong> The YouTube Data API has hard quota limits and would force me into approval queues. RSS is unlimited, stable, and gives me everything I need for the feed itself. AI only runs on click, so cost scales with actual usage and never with the size of my subscription list.</p>
+
+                <h2>The Pattern</h2>
+
+                <p>Six tools, one shape:</p>
+
+                <ol>
+                    <li><strong>One source, one sink.</strong> Each tool ingests from exactly one place (YouTube transcripts, a chat channel, a PDF, a WhatsApp screenshot, a YouTube RSS feed, a local OS) and writes to exactly one place (a Flask page, a chat reply, a filled PDF, a Markdown digest). No tool tries to be a hub.</li>
+                    <li><strong>An LLM call is the entire "intelligence."</strong> There is no model training, no fine-tuning, no vector store, no agent framework. The thinking is one or two prompts. Everything else is plumbing.</li>
+                    <li><strong>Cost discipline by model choice, not by retrieval tricks.</strong> GPT-4o-mini for summaries, GPT-3.5-turbo for digests, GPT-4 Vision only when image understanding is required. Claude (via OAuth) for the long-context personal assistant. Pick the cheapest model that passes the quality bar, not the biggest one available.</li>
+                    <li><strong>On-demand AI, not background AI.</strong> Five of the six only call the LLM when I ask, not on a timer. The exception (WhatsApp Summarizer) bounds its run to the screenshots in a single session. Nothing burns tokens while I'm asleep.</li>
+                    <li><strong>Markdown is the protocol.</strong> When a tool needs to talk to my other tools, it writes Markdown into a project folder. The notes pipeline picks it up. No queues, no schemas, no message brokers &mdash; just files.</li>
+                    <li><strong>One file or two, no framework.</strong> Flask + a single processor module. A Playwright script + an analyzer module. Twenty cron entries across the whole stack. If a tool stops working, the bug is in one of about three places.</li>
+                </ol>
+
+                <p>The most common failure mode I see in personal AI builds is overshooting the brief. Someone needs a YouTube summarizer and ends up architecting a multi-agent transcript pipeline with a vector DB and a React frontend. Each of these six tools is a deliberate refusal to do that. The constraint that made them work is the same constraint: <em>one problem, one script, one prompt, ship it.</em></p>
+
+                <h2>Tech Stack</h2>
+
+                <p><strong>Languages:</strong> Python 3 (five of six), TypeScript / Node (Moltbot). <strong>Web framework:</strong> Flask (TubeBrain, YouTube News Feed). <strong>LLMs:</strong> OpenAI GPT-4o-mini, GPT-3.5-turbo, GPT-4 Vision; Anthropic Claude via OAuth (Moltbot). <strong>YouTube ingestion:</strong> <code>youtube-transcript-api</code> for transcripts, channel RSS for discovery. <strong>Browser automation:</strong> Playwright (WhatsApp Summarizer). <strong>PDF:</strong> PyPDF2 + AcroForm + overlay fallback. <strong>Auth:</strong> Google OAuth (YouTube News Feed); Anthropic / OpenAI OAuth (Moltbot). <strong>Persistence:</strong> local JSON / pickle caches, Markdown digests routed into a shared notes folder. <strong>Deployment:</strong> all six run on a single Mac with cron and launchd; nothing requires a cloud account.</p>
+
+                <h2>Source</h2>
+
+                <p>Each tool lives in its own folder. TubeBrain, the YouTube News Feed, and the WhatsApp Summarizer are self-contained Flask / Playwright apps. Moltbot is a fork tailored to my own workspace and OAuth identities. The PDF Form Filler and Defender are personal utilities tied to private company / machine data. Code patterns and snippets shown above are representative; happy to walk through any of them in detail.</p>
+
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; Anand Mahajan &middot; <a href="../index.html">Back to portfolio</a></p>
+        </div>
+    </footer>
+</body>
+</html>

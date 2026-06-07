@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice-to-Action Pipeline | AI Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/project-page.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">AI Portfolio</a>
+            <ul class="nav-menu">
+                <li><a href="../index.html#projects">All Projects</a></li>
+                <li><a href="../index.html#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="project-header">
+        <div class="container">
+            <a href="../index.html#projects" class="back-link">&larr; Back to Projects</a>
+            <h1 class="project-page-title">Voice-to-Action Pipeline</h1>
+            <p class="project-page-tagline">From a $200 voice recorder to routed action items in the right project folder, no human in the loop &mdash; a 15-minute cron, two sync paths, and one Claude prompt do the rest.</p>
+            <div class="project-page-badges">
+                <span class="badge">15-min Cron</span>
+                <span class="badge">Dual-path Sync</span>
+                <span class="badge">Multi-project Routing</span>
+                <span class="badge">Claude-orchestrated</span>
+                <span class="badge">Offline-first Fallback</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="project-content">
+        <div class="container">
+            <div class="readme-content">
+
+                <p class="lead">I record meetings. Then what? For most people, the recording becomes a 90-minute MP4 they will never open again. For me, it becomes a markdown file in the right project folder within 30 minutes &mdash; classified, summarised, and with action items extracted &mdash; without me touching a keyboard between the recording stopping and the file landing. This case study walks through how that pipeline is built: a Plaud voice recorder on one end, three Python scripts and a shell script in the middle, and Claude as the routing brain at the back.</p>
+
+                <h2>The Problem I Was Solving</h2>
+
+                <p>I run multiple parallel workstreams. Some are consulting engagements with their own jargon and their own ticket numbers. Some are family-side projects with their own document trails. Each one generates voice context every week &mdash; standups, design discussions, phone calls with lawyers, conversations with my parents. A recording-to-text tool is necessary but nowhere near sufficient. The transcript itself is just more raw material. The real question is: <strong>where does the transcript belong, and what does it commit me to do next?</strong></p>
+
+                <p>I tried Otter.ai first. It transcribes, but it does not route, it does not extract action items into <em>my</em> file system, and it puts my meeting corpus on someone else's servers behind an account I do not own. I did not want a SaaS island. I wanted a pipeline that ended in markdown files inside my Dropbox tree, named the way I name files, organised the way I organise projects, summarised in the categories I care about. The transcript service is a commodity; the routing is the value.</p>
+
+                <p>The constraint that drove the design: <strong>no manual step between recording and a usable artifact</strong>. If I have to open a web app, copy a transcript, paste it somewhere, pick a project, and click save, I will not do it &mdash; not after the fourth meeting of the day. The whole pipeline has to run on a cron without me.</p>
+
+                <h2>System Architecture</h2>
+
+                <p>The pipeline has four stages, each isolated from the next by a flat file or a folder. There is no message bus, no webhook, no worker queue. Every handoff is a directory on disk or a markdown file:</p>
+
+<pre><code>┌──────────────────────────────────────────────────────────────┐
+│  STAGE 1 — Capture                                           │
+│  Plaud voice recorder (carried in pocket)                    │
+│    • Hardware button → record                                │
+│    • Audio uploaded to Plaud cloud                           │
+│    • Plaud's service transcribes + diarises (speaker turns)  │
+└──────────────────────────────────────────────────────────────┘
+                              ↓
+┌──────────────────────────────────────────────────────────────┐
+│  STAGE 2 — Sync (dual-path)                                  │
+│                                                              │
+│  PRIMARY:  Plaud → Google Drive ("Plaud Transcripts" folder) │
+│            fetch_from_google_drive.py  (OAuth, no token)     │
+│                                                              │
+│  BACKUP:   Plaud REST API (api.plaud.ai)                     │
+│            fetch_transcripts.py  (bearer token, ~10mo TTL)   │
+│                                                              │
+│  Both write to:  ANAND/inbox/plaud/YYYY-MM-DD_HH-MM_*.md     │
+└──────────────────────────────────────────────────────────────┘
+                              ↓
+┌──────────────────────────────────────────────────────────────┐
+│  STAGE 3 — Routing brain (every 15 min)                      │
+│  notes_processor/process_notes.sh on the Mac                 │
+│    1. Pull queue from public dashboard                       │
+│    2. Bail if empty                                          │
+│    3. Pipe queue + PROMPT.md → claude --print                │
+│    4. Clear remote queue on success                          │
+└──────────────────────────────────────────────────────────────┘
+                              ↓
+┌──────────────────────────────────────────────────────────────┐
+│  STAGE 4 — Project folders (the payoff)                      │
+│    INN/notes/YYYY-MM-DD.md         (Capital Group work)      │
+│    TTT/notes/sap/YYYY-MM-DD.md     (UNFI / SAP)              │
+│    TTT/notes/data_engineering/...  (UNFI / DE)               │
+│    BAMPFA/notes/YYYY-MM-DD.md      (museum project)          │
+│    cars180/notes/YYYY-MM-DD.md     (side project)            │
+│    ANAND/notes/voice/YYYY-MM-DD.md (personal log, always)    │
+└──────────────────────────────────────────────────────────────┘</code></pre>
+
+                <p>The intentional choice at every boundary is to use a flat file or a folder instead of a service. The sync state is a JSON file. The queue is a markdown file. The prompt is a markdown file. The destination is a directory. If anything breaks, the failure point is one of three Python scripts or one shell script &mdash; not a vendor outage, not an expired webhook, not a queue that drained without me knowing.</p>
+
+                <h2>Component 1 &mdash; Capture: Why a Hardware Recorder</h2>
+
+                <p>I carry a Plaud recorder. Single physical button. The reason it beats a phone app: the phone is a hostile environment for capture. Notifications interrupt. Battery drains. iOS revokes mic access in the background. A dedicated device with a physical record button is more reliable and lower-friction than any app, and it never makes me unlock a screen mid-conversation. The recorder mirrors audio to Plaud's cloud, where their backend runs transcription with speaker diarisation. That part I outsource &mdash; I have no edge over Plaud at making mel-spectrograms.</p>
+
+                <p>I also keep an <strong>offline transcriber</strong> bench-ready in a separate folder (<code>offline-transcriber/</code>) built around Vosk &mdash; small model (40 MB) for real-time, large model (1.8 GB) for accuracy. It is not in the production pipeline today; it is my insurance policy. The day Plaud sunsets their cloud, or the day I want to transcribe a meeting that should never touch a third-party server (legal calls, family medical), I have a fully offline path ready:</p>
+
+<pre><code># offline-transcriber/testing/file_transcribe.py (excerpt)
+model = Model("models/vosk-model-en-us-0.22")
+rec = KaldiRecognizer(model, wf.getframerate())
+rec.SetWords(True)
+
+while True:
+    data = wf.readframes(4000)
+    if len(data) == 0: break
+    if rec.AcceptWaveform(data):
+        results.append(json.loads(rec.Result()))
+
+final = json.loads(rec.FinalResult())</code></pre>
+
+                <p>Vosk runs locally on a CPU, no GPU required. Output includes word-level timing, which lets me emit SRT subtitles for video review. The decision to keep an offline path warm, even though I do not use it day to day, is itself the lesson: vendor risk is a real risk for personal infrastructure, and the cost of a fallback is one folder of code I keep maintained.</p>
+
+                <h2>Component 2 &mdash; Dual-Path Sync (the most important design decision)</h2>
+
+                <p>The transcript has to land in <code>ANAND/inbox/plaud/</code> on my Mac. There are two ways to get it there, and I run both:</p>
+
+                <p><strong>Primary path &mdash; Google Drive.</strong> Plaud has a setting to mirror new transcripts into a chosen Google Drive folder. I created <em>Plaud Transcripts</em> in my Drive, point Plaud at it, and a Python script (<code>fetch_from_google_drive.py</code>) polls the folder using the same Google OAuth credentials I already use for Calendar sync. No second token to manage. The script keeps a <code>drive_sync_state.json</code> file that maps Drive file IDs to their last-modified timestamps, so it only downloads new or updated transcripts:</p>
+
+<pre><code># fetch_from_google_drive.py (excerpt)
+query = f"'{folder_id}' in parents and trashed=false"
+results = service.files().list(
+    q=query,
+    orderBy='modifiedTime desc',
+    fields='files(id, name, mimeType, modifiedTime, createdTime)',
+).execute()
+
+for file in results.get('files', []):
+    if file['id'] in synced_files \
+       and synced_files[file['id']] == file['modifiedTime']:
+        continue   # already pulled, skip
+    download_file(service, file['id'], file['name'])
+    synced_files[file['id']] = file['modifiedTime']</code></pre>
+
+                <p><strong>Backup path &mdash; Plaud REST API.</strong> If the Drive integration breaks (Plaud changes their export, Zapier mapping drifts, Drive folder accidentally renamed), I do not want to be stuck. <code>fetch_transcripts.py</code> talks directly to <code>api.plaud.ai</code> with a bearer token I copy out of the web app's localStorage (<code>plaud_token.txt</code>, ~10-month TTL). It hits <code>/file/simple/web</code> for the file list, then <code>/file/detail/{id}</code> for the signed S3 URLs that hold the transcript JSON, ungzips the payload, and writes the same markdown format the Drive path produces:</p>
+
+<pre><code># fetch_transcripts.py (excerpt)
+def get_headers(token):
+    return {
+        "Authorization": f"bearer {token}",
+        "Accept": "application/json",
+        "Origin": "https://web.plaud.ai",
+    }
+
+resp = requests.get(f"{API_BASE}/file/simple/web",
+                    headers=get_headers(token),
+                    params={"skip": 0, "limit": 50,
+                            "is_trash": 2,
+                            "sort_by": "start_time",
+                            "is_desc": "true"})
+files = resp.json().get("data_file_list", [])
+
+for f in files:
+    detail = requests.get(f"{API_BASE}/file/detail/{f['id']}", ...).json()
+    transcript_url = next(item["data_link"]
+                          for item in detail["data"]["content_list"]
+                          if item["data_type"] == "transaction")
+    data = gzip.decompress(requests.get(transcript_url).content)
+    transcript_text = format_transcript(json.loads(data))</code></pre>
+
+                <p>Why both? Because the cost of writing the second path once is small, and the cost of being blocked on Friday evening because the only path failed is large. Both write into the same inbox, both maintain their own sync-state JSON, and either one can be the only one running for weeks without the other noticing.</p>
+
+                <p>Each transcript lands as <code>YYYY-MM-DD_HH-MM_Meeting_Title.md</code> with a YAML-ish header (date, duration, source, ID), an optional summary block from Plaud's auto-summary, and the full transcript with timestamps and speaker labels:</p>
+
+<pre><code># 2026-05-28 14:02 Capital Group standup
+
+**Date:** 2026-05-28 14:02
+**Duration:** 28m 14s
+**Source:** Plaud
+
+---
+
+## Transcript
+
+[00:02] **Speaker 1**: Let's start with the IPAC silver layer review...
+[00:18] **Speaker 2**: I pushed the DBT changes last night, ticket IPAC-12891...</code></pre>
+
+                <h2>Component 3 &mdash; The Routing Brain</h2>
+
+                <p>Now the interesting part. A transcript sitting in <code>inbox/plaud/</code> is not yet useful. I need it classified into the right project folder, with action items extracted, with the noise filtered out (Plaud records continuously, so 70% of any transcript is background café chatter and small talk). This is where Claude earns its keep.</p>
+
+                <p>A 15-minute cron on the Mac runs a single shell script (<code>process_notes.sh</code>) that does four things in sequence:</p>
+
+<pre><code># notes_processor/process_notes.sh (essence)
+QUEUE_URL="https://&lt;my-domain&gt;/queue/notes.md"
+QUEUE_LOCAL="$SCRIPT_DIR/inbox/notes_queue.md"
+
+# 1. Pull queue from public dashboard
+curl -s "$QUEUE_URL" -o "$QUEUE_LOCAL"
+
+# 2. Bail if empty (don't burn tokens)
+[ -z "$(cat "$QUEUE_LOCAL" | tr -d '[:space:]')" ] && exit 0
+
+# 3. Hand off to Claude with our routing prompt
+"$CLAUDE_BIN" -p "$(cat "$PROMPT_FILE")" \
+  --dangerously-skip-permissions 2&gt;&amp;1 | tee -a "$LOG_FILE"
+
+# 4. Clear remote queue only on success
+if [ $? -eq 0 ]; then
+    ssh root@&lt;my-vps&gt; "&gt; /var/www/dashboard/queue/notes.md"
+fi</code></pre>
+
+                <p>The cron is dumb on purpose. All the intelligence lives in <code>PROMPT.md</code>, which I can edit without redeploying anything. The prompt itself is a documented decision tree. Here is the noise filter:</p>
+
+<pre><code># PROMPT.md — Step 2: Filter Noise
+
+Plaud records continuously, so transcripts contain background noise. IGNORE:
+- Random background conversations (store clerks, strangers)
+- Filler phrases: "I'm sorry", "Okay", "Thank you", "I don't know", "Music"
+- Very short fragments under 10 words with no context
+- Timestamps with no meaningful content after them
+- Speaker 2/3/etc if they're clearly not me (background people)
+
+KEEP only:
+- Direct instructions starting with "ok this is personal" or "for TTT"
+- Action items, reminders, ideas
+- Meeting notes, follow-ups
+- Family/personal plans, project-related thoughts</code></pre>
+
+                <p>The classifier is keyword-based but interpreted by Claude, which means it handles fuzzy matches (Capital Group / "Cap Group" / "IPAC" all route to the same project) and resolves obvious transcription errors using a small name dictionary at the bottom of the prompt:</p>
+
+<pre><code># PROMPT.md — Step 3: Project routing
+| Context cue                                | Project    | Save to                          |
+|--------------------------------------------|------------|----------------------------------|
+| "ok this is personal"                      | Personal   | ANAND/notes/voice/YYYY-MM-DD.md  |
+| "for TTT" or "TTT note"                    | TTT        | TTT/notes/YYYY-MM-DD.md          |
+| "INN" / "Capital Group" / "IPAC" / "Ryan"  | INN/CG     | INN/notes/YYYY-MM-DD.md          |
+| "cars180" / "car data"                     | cars180    | cars180/notes/YYYY-MM-DD.md      |
+| "BAMPFA" / "museum" / "exhibition"         | BAMPFA     | BAMPFA/notes/YYYY-MM-DD.md       |
+| (no cue)                                   | Personal   | ANAND/notes/voice/YYYY-MM-DD.md  |
+
+# Known transcription errors to fix
+| Transcribed     | Correct          |
+|-----------------|------------------|
+| Sneha           | Snehal (wife)    |
+| Rehan / Ridhan  | Rayaan / Hridhaan|
+| Ryan (in INN)   | Rayaan or Ryan?  | ← ambiguous, ask context</code></pre>
+
+                <p>The output is deterministic: every note ends up in two places &mdash; the central voice log at <code>ANAND/notes/voice/YYYY-MM-DD.md</code> (always), plus the project folder if the routing matched something specific. The double-write means I can grep the voice log for everything chronologically while still finding project-relevant items under the project folder.</p>
+
+                <p>The queue itself can be populated two ways: (a) Plaud transcripts dropped into <code>inbox/plaud/</code> get summarised and the summary line goes into the queue, or (b) I tap a Quick Note on the dashboard PWA from my phone, which POSTs to a PHP endpoint on my VPS that appends to <code>queue/notes.md</code>. Either way, the same routing brain handles it. The cron does not care where the queue line came from.</p>
+
+                <h2>Why It Works &mdash; Design Decisions Worth Defending</h2>
+
+                <p><strong>Why not Otter.ai?</strong> Otter transcribes well. It does not route into <em>my</em> file system, it does not let me edit the classifier (the classifier is the value), and the corpus lives on their servers behind their account. The transcripts are mine in the loosest sense. With Plaud + Drive + my own routing, I own the artifacts in plain markdown on my disk.</p>
+
+                <p><strong>Why dual-path sync?</strong> Because vendor lock-in is a tax I refuse to pay on my own infrastructure. Drive is the primary because it requires zero token management (Google OAuth is already set up for Calendar). The REST API is the backup because Plaud could change their Drive export tomorrow and I want to be untroubled when they do. The marginal cost of running both is a second Python script I rarely touch.</p>
+
+                <p><strong>Why a 15-minute cron instead of webhooks?</strong> Pull beats push for personal infrastructure. A webhook means a public listener on my Mac, which means a tunnel, an open port, and a new attack surface. A cron pulling a static markdown file off a hardened nginx box is cheaper to reason about, has zero open ports, and the worst-case latency (15 minutes) is below my tolerance for "did that note land?"</p>
+
+                <p><strong>Why a markdown file as the queue?</strong> Same first-principles reason a flat file beats Redis for a one-user system. A queue with no consumers and no producers other than me does not need broker semantics. <code>curl</code>, <code>cat</code>, and <code>&gt; file</code> are the only operations. I can read it, edit it, audit it, replay it. If the cron fails, the queue does not disappear &mdash; it just stays full until the next run.</p>
+
+                <p><strong>Why Claude as the routing brain instead of regex rules?</strong> I started with regex. It broke the first time someone said "Cap Group" instead of "Capital Group." It broke harder when a transcript said "Brian" but meant "Ryan" (homophone, common in Plaud transcripts). Claude is a good-enough fuzzy classifier with built-in error correction, and the prompt is editable in 30 seconds. The cost per run is fractions of a cent. The total cost of running this pipeline for a year is less than one Otter.ai monthly subscription.</p>
+
+                <p><strong>Why a separate offline-transcriber folder I do not actively use?</strong> Because the day I need it, I will not have time to build it. Keeping Vosk warm with both small and large models downloaded, scripts that take a file path and return SRT/JSON/text, and a tested venv is cheap insurance.</p>
+
+                <h2>What I Learned</h2>
+
+                <p>The first principle behind the whole thing: <strong>the transcript is not the product. The routed, classified, action-extracted note in the right project folder is the product.</strong> Most voice-to-text tools optimise the transcription. The transcription is the easy part now &mdash; commodity, accurate, cheap. The hard part is everything downstream: classification, name correction, noise filtering, action extraction, routing, archival. That is where a thoughtful prompt and a 15-minute cron beat a $20/month SaaS hands down.</p>
+
+                <p>Second lesson: <strong>flat files are an underrated runtime</strong>. A markdown file as a queue. A JSON file as sync state. A markdown file as the prompt. A directory as the destination. None of these need a database. None of these need a server. They survive a Mac reboot, a Dropbox sync conflict, a Claude CLI upgrade. The simplest persistence layer that meets the requirement is almost always a file.</p>
+
+                <p>Third lesson: <strong>build the backup path the same day you build the primary</strong>. The marginal cost of writing the second sync script while the first one is fresh in my head was an afternoon. Writing it six months later, after the first one breaks, would cost a weekend and a lost transcript. The discipline is paid up front.</p>
+
+                <p>Fourth lesson: <strong>own your corpus</strong>. Every transcript I have ever recorded is sitting in my Dropbox tree as plain markdown, dated and named consistently. I can grep it. I can feed it into a personal RAG. I can run analytics. I can fine-tune on it eventually. None of that is available to an Otter user.</p>
+
+                <h2>Tech Stack</h2>
+
+                <p>Python 3 (sync scripts, classification helpers). Google Drive API + OAuth (primary sync path, scopes shared with Calendar integration). Plaud REST API + bearer token (backup sync path). Bash + cron (15-minute orchestration loop). Claude CLI (<code>claude --print</code>) as the routing brain. Markdown files as queue, prompt, transcripts, and output. Vosk (small + large English models) as the offline-first fallback transcriber. Dropbox as the cross-machine persistence layer.</p>
+
+                <h2>Source</h2>
+
+                <p>The pipeline runs on personal infrastructure and processes private meeting content (client work, family conversations, legal discussions), so the production scripts stay private. Code patterns, architecture, and component-level snippets shown above are representative of the production system. Reach out if you would like a deeper walk-through of the prompt design or the dual-path sync.</p>
+
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; Anand Mahajan &middot; <a href="../index.html">Back to portfolio</a></p>
+        </div>
+    </footer>
+</body>
+</html>

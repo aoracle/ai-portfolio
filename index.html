@@ -19,6 +19,7 @@
                 <li><a href="#philosophy">Philosophy</a></li>
                 <li><a href="#projects">Projects</a></li>
                 <li><a href="#tech">Tech Stack</a></li>
+                <li><a href="catalog.html">Catalog</a></li>
                 <li><a href="#contact">Contact</a></li>
             </ul>
             <button class="nav-toggle" aria-label="Toggle menu">
@@ -45,12 +46,16 @@
                 <span class="stat-label">Years Experience</span>
             </div>
             <div class="stat">
-                <span class="stat-number">9</span>
+                <span class="stat-number">13</span>
                 <span class="stat-label">AI Projects</span>
             </div>
             <div class="stat">
-                <span class="stat-number">8,840+</span>
-                <span class="stat-label">Car Listings Live</span>
+                <span class="stat-number">850K+</span>
+                <span class="stat-label">Lines of Code</span>
+            </div>
+            <div class="stat">
+                <span class="stat-number">5</span>
+                <span class="stat-label">Categories</span>
             </div>
         </div>
     </section>
@@ -84,13 +89,157 @@
         </div>
     </section>
 
-    <!-- Projects Section -->
+        <!-- Projects Section -->
     <section id="projects" class="projects">
         <div class="container">
             <h2 class="section-title">AI Projects</h2>
-            <p class="section-subtitle">Production systems solving real problems</p>
+            <p class="section-subtitle">13 production systems organized into 5 categories</p>
 
-            <div class="projects-grid">
+            <style>
+                .projects-categories { display: flex; flex-direction: column; gap: 56px; }
+                .category-title { font-size: 1.7rem; font-weight: 600; margin-bottom: 4px; color: #1a1a1a; border-bottom: 2px solid #d0d0d0; padding-bottom: 12px; }
+                .category-subtitle { color: #666; font-size: 0.95rem; margin-top: 8px; margin-bottom: 28px; font-style: italic; }
+            </style>
+            
+            <div class="filter-bar-wrapper" style="margin-bottom: 32px;">
+                <p style="color: #666; font-size: 0.85rem; margin-bottom: 10px; font-weight: 500;">FILTER BY TECH OR CATEGORY:</p>
+                <div class="chip-row">
+                    <span class="filter-chip active" data-filter="all">All (13)</span>
+                    <span class="filter-chip" data-filter="enterprise">Enterprise (4)</span>
+                    <span class="filter-chip" data-filter="personal">Personal AI (4)</span>
+                    <span class="filter-chip" data-filter="browser">Browser (1)</span>
+                    <span class="filter-chip" data-filter="trading">Trading (1)</span>
+                    <span class="filter-chip" data-filter="media">Media (3)</span>
+                    <span class="filter-chip" data-filter="claude">Claude</span>
+                    <span class="filter-chip" data-filter="gpt-4">GPT-4</span>
+                    <span class="filter-chip" data-filter="databricks">Databricks</span>
+                    <span class="filter-chip" data-filter="postgres">PostgreSQL</span>
+                    <span class="filter-chip" data-filter="playwright">Playwright</span>
+                    <span class="filter-chip" data-filter="python">Python</span>
+                    <span class="filter-chip" data-filter="mcp">MCP</span>
+                </div>
+                <a href="catalog.html" style="display: inline-block; margin-top: 14px; font-size: 0.9rem; color: #1a1a1a; font-weight: 600; text-decoration: none; border-bottom: 1px solid #1a1a1a;">→ Full catalog table</a>
+            </div>
+            <style>
+                .chip-row { display: flex; flex-wrap: wrap; gap: 8px; }
+                .filter-chip { display: inline-block; background: #eee; color: #333; padding: 6px 14px; border-radius: 16px; font-size: 0.85rem; cursor: pointer; user-select: none; border: 1px solid transparent; transition: all 0.15s; }
+                .filter-chip:hover { background: #ddd; }
+                .filter-chip.active { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+                .project-card[data-hidden="true"], .project-card-showcase[data-hidden="true"] { display: none !important; }
+                .project-category[data-hidden="true"] { display: none !important; }
+            </style>
+
+            <div class="projects-categories">
+
+                <!-- ========== ENTERPRISE DATA & AI ========== -->
+                <div class="project-category">
+                    <h3 class="category-title">Enterprise Data & AI</h3>
+                    <p class="category-subtitle">Production data systems for enterprise and museum clients</p>
+                    <div class="projects-grid">
+<!-- Project 9: BAMPFA CMS -->
+                <div class="project-card-showcase">
+                    <div class="showcase-preview">
+                        <img src="images/projects/bampfa-preview.png" alt="BAMPFA CMS - Berkeley Art Museum Database Modernization" class="showcase-image clickable-image" onclick="openLightbox(this.src)">
+                    </div>
+                    <div class="showcase-content">
+                        <div class="project-badge">Live CMS</div>
+                        <h3 class="project-title has-tooltip">
+                            <a href="projects/bampfa.html" class="project-link-dark">BAMPFA CMS</a>
+                            <div class="tooltip">
+                                <strong>Berkeley Art Museum Database Modernization</strong>
+                                <p>Comprehensive database architecture and CMS replacing outdated Drupal 7 system for BAMPFA.</p>
+                                <ul>
+                                    <li><strong>Unified 3 Systems:</strong> FileMaker, CollectionSpace, Tessitura integration</li>
+                                    <li><strong>53-Table Schema:</strong> PostgreSQL 16 with optimized architecture</li>
+                                    <li><strong>Flask CMS:</strong> Role-based access, workflows, audit trails</li>
+                                    <li><strong>Production Ready:</strong> Live on Digital Ocean with daily backups</li>
+                                    <li><strong>Media Management:</strong> Centralized file handling with metadata</li>
+                                </ul>
+                                <span class="tooltip-tech">PostgreSQL • Python • Flask • Nginx • Digital Ocean</span>
+                            </div>
+                        </h3>
+                        <p class="project-tagline-dark">Database Modernization for Berkeley Art Museum</p>
+                        <p class="project-description">Comprehensive CMS and database architecture unifying 3 legacy systems (FileMaker, CollectionSpace, Tessitura) into scalable PostgreSQL platform. Complete content workflows, audit trails, and role-based access.</p>
+                        <div class="project-metrics">
+                            <span class="metric"><strong>53</strong> Tables</span>
+                            <span class="metric"><strong>3</strong> Systems Unified</span>
+                            <span class="metric"><strong>Phase 4</strong> Complete</span>
+                        </div>
+                        <div class="project-tech">
+                            <span class="tech-badge">PostgreSQL 16</span>
+                            <span class="tech-badge">Python</span>
+                            <span class="tech-badge">Flask</span>
+                            <span class="tech-badge">Nginx</span>
+                            <span class="tech-badge">Digital Ocean</span>
+                        </div>
+                        <div class="card-meta" style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #ddd; font-size: 0.82rem; color: #666;"><div><strong>Active:</strong> Aug 2025 — May 2026</div><div style="margin-top: 4px;"><em>Museum data is relational, not document — Drupal→Postgres migration via a 53-table schema.</em></div></div>
+                    <a href="projects/bampfa.html" class="btn-details-dark">View Details →</a>
+                    </div>
+                </div>
+<!-- Project 8: DBValidator -->
+                <div class="project-card">
+                    <div class="project-badge">Production</div>
+                    <h3 class="project-title has-tooltip">
+                        <a href="projects/dbvalidator.html" class="project-link-dark">DBValidator</a>
+                        <div class="tooltip">
+                            <strong>Multi-Platform Database Validation</strong>
+                            <p>Intelligent database validation tool with 4 matching modes.</p>
+                            <ul>
+                                <li><strong>Exact Match:</strong> Row-by-row comparison with hash validation</li>
+                                <li><strong>Selective:</strong> Compare specific columns with tolerance</li>
+                                <li><strong>DQ Rules:</strong> Data quality rule-based validation</li>
+                                <li><strong>Adaptive:</strong> Handle transformations during migration</li>
+                                <li><strong>122 Tests:</strong> 90 unit + 32 integration tests</li>
+                            </ul>
+                            <span class="tooltip-tech">Python • Oracle • Databricks • Snowflake • PostgreSQL</span>
+                        </div>
+                    </h3>
+                    <p class="project-description">Multi-platform database validation with 4 modes: Exact Match, Selective, DQ Rules, Adaptive. Supports Oracle, Databricks, Snowflake, PostgreSQL.</p>
+                    <div class="project-metrics">
+                        <span class="metric"><strong>122</strong> Tests</span>
+                        <span class="metric"><strong>4</strong> Modes</span>
+                        <span class="metric"><strong>5</strong> Platforms</span>
+                    </div>
+                    <div class="project-tech">
+                        <span class="tech-badge">Python</span>
+                        <span class="tech-badge">Oracle</span>
+                        <span class="tech-badge">Databricks</span>
+                        <span class="tech-badge">Snowflake</span>
+                    </div>
+                    <div class="card-meta" style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #ddd; font-size: 0.82rem; color: #666;"><div><strong>Active:</strong> Oct 2025 — Feb 2026</div><div style="margin-top: 4px;"><em>Migration confidence comes from MD5-hash row-level proofs, not sample checks.</em></div></div>
+                    <a href="projects/dbvalidator.html" class="btn-details">View Details →</a>
+                </div>
+                <!-- DBSQL Agent -->
+                <div class="project-card">
+                    <div class="project-badge">Enterprise</div>
+                    <h3 class="project-title has-tooltip"><a href="projects/dbsql-agent.html" class="project-link">Databricks SQL Agent</a>
+                        <div class="tooltip">
+                            <strong>Natural-Language SQL for Databricks Workspaces</strong>
+                            <p>Talks to Unity Catalog, generates safe SQL, executes against the right warehouse, returns results &mdash; without leaving Claude.</p>
+                            <ul>
+                                <li><strong>Unity Catalog Aware:</strong> Schema metadata for grounded SQL</li>
+                                <li><strong>Token Auth:</strong> Personal access tokens, no service principal overhead</li>
+                                <li><strong>MCP Compatible:</strong> Slots into Claude Desktop / Cursor</li>
+                                <li><strong>Multi-warehouse:</strong> Routes queries to the right SQL warehouse</li>
+                            </ul>
+                            <span class="tooltip-tech">Python &middot; Databricks SQL &middot; Unity Catalog &middot; MCP</span>
+                        </div>
+                    </h3>
+                    <p class="project-description">Natural-language SQL agent for Databricks. Reads Unity Catalog schema, generates safe SQL, runs against the right warehouse, returns results &mdash; all without leaving the chat.</p>
+                    <div class="project-metrics">
+                        <span class="metric"><strong>Unity</strong> Catalog Aware</span>
+                        <span class="metric"><strong>MCP</strong> Compatible</span>
+                        <span class="metric"><strong>Token</strong> Auth</span>
+                    </div>
+                    <div class="project-tech">
+                        <span class="tech-badge">Python</span>
+                        <span class="tech-badge">Databricks SQL</span>
+                        <span class="tech-badge">Unity Catalog</span>
+                        <span class="tech-badge">MCP</span>
+                    </div>
+                    <div class="card-meta" style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #ddd; font-size: 0.82rem; color: #666;"><div><strong>Active:</strong> Sep 2025 — Feb 2026</div><div style="margin-top: 4px;"><em>Schema metadata in the prompt prevents hallucinated SQL on enterprise warehouses.</em></div></div>
+                    <a href="projects/dbsql-agent.html" class="btn-details">View Details →</a>
+                </div>
                 <!-- Project 1: cars180 -->
                 <div class="project-card-showcase">
                     <div class="showcase-preview">
@@ -130,12 +279,115 @@
                         </div>
                         <div class="showcase-buttons">
                             <a href="https://cars180.com" target="_blank" class="btn-visit-dark">Visit Site →</a>
-                            <a href="projects/cars180.html" class="btn-details-dark">View Details →</a>
+                            <div class="card-meta" style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #ddd; font-size: 0.82rem; color: #666;"><div><strong>Active:</strong> Jun 2025 — Apr 2026</div><div style="margin-top: 4px;"><em>Multi-source scraping + unified schema beats any single source for breadth.</em></div></div>
+                    <a href="projects/cars180.html" class="btn-details-dark">View Details →</a>
                         </div>
                     </div>
                 </div>
+                    </div>
+                </div>
 
-                <!-- Project 2: IceOder.ai -->
+                <!-- ========== PERSONAL AI INFRASTRUCTURE ========== -->
+                <div class="project-category">
+                    <h3 class="category-title">Personal AI Infrastructure</h3>
+                    <p class="category-subtitle">Daily-use tools so AI works for me, not the other way around</p>
+                    <div class="projects-grid">
+<!-- Project 10: Gajadata Life-OS -->
+                <div class="project-card">
+                    <div class="project-badge">Production</div>
+                    <h3 class="project-title has-tooltip"><a href="projects/gajadata.html" class="project-link">Gajadata Life-OS</a>
+                        <div class="tooltip">
+                            <strong>Personal Operating System on a $6/mo VPS</strong>
+                            <p>Mobile voice notes routed by Claude into project-aware action items, synced across 4 machines, installable as a PWA on iPhone.</p>
+                            <ul>
+                                <li><strong>3-Plane Architecture:</strong> Public VPS, Private Mac, Sync layer</li>
+                                <li><strong>15-min AI Cron:</strong> Pull queue, Claude routes, project folders</li>
+                                <li><strong>PWA on iPhone:</strong> Cache-busting service worker</li>
+                                <li><strong>Daily backup + KB export:</strong> rsync + Claude conversation archive</li>
+                            </ul>
+                            <span class="tooltip-tech">Nginx • Bash • PHP • Claude CLI • Tailscale • Cron</span>
+                        </div>
+                    </h3>
+                    <p class="project-description">A personal life-OS &mdash; mobile-first dashboard, Claude-orchestrated notes routing, daily backup + Claude conversation knowledge base export. Pull-based architecture across a VPS, a private Mac, and a sync layer.</p>
+                    <div class="project-metrics">
+                        <span class="metric"><strong>$6/mo</strong> VPS</span>
+                        <span class="metric"><strong>15-min</strong> AI Cron</span>
+                        <span class="metric"><strong>4 Machines</strong> Synced</span>
+                    </div>
+                    <div class="project-tech">
+                        <span class="tech-badge">Nginx</span>
+                        <span class="tech-badge">Bash</span>
+                        <span class="tech-badge">Claude CLI</span>
+                        <span class="tech-badge">Tailscale</span>
+                        <span class="tech-badge">PWA</span>
+                    </div>
+                    <div class="card-meta" style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #ddd; font-size: 0.82rem; color: #666;"><div><strong>Active:</strong> Feb 2026 — Ongoing</div><div style="margin-top: 4px;"><em>Static HTML + cron + a markdown queue is enough infrastructure for a personal OS.</em></div></div>
+                    <a href="projects/gajadata.html" class="btn-details">View Details →</a>
+                </div>
+                <!-- Voice-to-Action Pipeline -->
+                <div class="project-card">
+                    <div class="project-badge">Production</div>
+                    <h3 class="project-title has-tooltip"><a href="projects/voice-to-action.html" class="project-link">Voice-to-Action Pipeline</a>
+                        <div class="tooltip">
+                            <strong>From Voice Recording to Routed Action Items</strong>
+                            <p>Plaud voice recorder &rarr; AI transcription &rarr; Claude classification &rarr; project folder routing, no human in the loop.</p>
+                            <ul>
+                                <li><strong>Dual-path Sync:</strong> Google Drive primary, Plaud REST API backup</li>
+                                <li><strong>15-min AI Cron:</strong> Claude reads queue, routes per tag</li>
+                                <li><strong>Multi-project Routing:</strong> [INN], [TTT], [cars180], personal</li>
+                                <li><strong>Speaker-tagged Transcripts:</strong> Timestamped markdown files</li>
+                            </ul>
+                            <span class="tooltip-tech">Plaud &middot; Google Drive &middot; Python &middot; Claude CLI &middot; Bash</span>
+                        </div>
+                    </h3>
+                    <p class="project-description">A pipeline that turns my Plaud voice recordings into routed, project-tagged action items via Claude. Dual-path sync, 15-min cron, no human in the loop.</p>
+                    <div class="project-metrics">
+                        <span class="metric"><strong>15-min</strong> Cron</span>
+                        <span class="metric"><strong>Dual-path</strong> Sync</span>
+                        <span class="metric"><strong>Multi-project</strong> Routing</span>
+                    </div>
+                    <div class="project-tech">
+                        <span class="tech-badge">Plaud</span>
+                        <span class="tech-badge">Google Drive</span>
+                        <span class="tech-badge">Python</span>
+                        <span class="tech-badge">Claude CLI</span>
+                        <span class="tech-badge">Bash</span>
+                    </div>
+                    <div class="card-meta" style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #ddd; font-size: 0.82rem; color: #666;"><div><strong>Active:</strong> Jan 2026 — May 2026</div><div style="margin-top: 4px;"><em>Dual-path sync (Drive primary, REST backup) prevents single-vendor lock-in.</em></div></div>
+                    <a href="projects/voice-to-action.html" class="btn-details">View Details →</a>
+                </div>
+                <!-- Custom Claude Infrastructure -->
+                <div class="project-card">
+                    <div class="project-badge">Personal Infra</div>
+                    <h3 class="project-title has-tooltip"><a href="projects/claude-infra.html" class="project-link">Custom Claude Infrastructure</a>
+                        <div class="tooltip">
+                            <strong>Memory + Tools + Tutorial Layer</strong>
+                            <p>A persistent file-based memory system, custom CLI wrappers, and educational templates that make Claude remember and integrate across my work.</p>
+                            <ul>
+                                <li><strong>Persistent Memory:</strong> Markdown files with frontmatter for cross-session continuity</li>
+                                <li><strong>Custom Tools:</strong> CLI wrappers extending Claude's reach</li>
+                                <li><strong>Tutorial Layer:</strong> Reusable templates and reference patterns</li>
+                                <li><strong>Multi-machine:</strong> Synced via Dropbox across 4 devices</li>
+                            </ul>
+                            <span class="tooltip-tech">Markdown &middot; Frontmatter &middot; Bash &middot; Claude CLI</span>
+                        </div>
+                    </h3>
+                    <p class="project-description">Persistent file-based memory, custom CLI tooling, and an education layer built on top of Claude &mdash; so it remembers, integrates, and scales across my work.</p>
+                    <div class="project-metrics">
+                        <span class="metric"><strong>Persistent</strong> Memory</span>
+                        <span class="metric"><strong>Cross-Session</strong> Continuity</span>
+                        <span class="metric"><strong>Multi-Machine</strong> Sync</span>
+                    </div>
+                    <div class="project-tech">
+                        <span class="tech-badge">Markdown</span>
+                        <span class="tech-badge">Bash</span>
+                        <span class="tech-badge">Claude CLI</span>
+                        <span class="tech-badge">File-based</span>
+                    </div>
+                    <div class="card-meta" style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #ddd; font-size: 0.82rem; color: #666;"><div><strong>Active:</strong> Mar 2026 — Apr 2026</div><div style="margin-top: 4px;"><em>Markdown files with frontmatter make a portable, queryable memory layer.</em></div></div>
+                    <a href="projects/claude-infra.html" class="btn-details">View Details →</a>
+                </div>
+<!-- Project 2: IceOder.ai -->
                 <div class="project-card-showcase">
                     <div class="showcase-preview">
                         <img src="images/projects/iceoder-preview.png" alt="IceOder.ai - AI-Powered Productivity Suite" class="showcase-image clickable-image" onclick="openLightbox(this.src)">
@@ -172,11 +424,23 @@
                             <span class="tech-badge">OpenAI</span>
                             <span class="tech-badge">Google APIs</span>
                         </div>
-                        <a href="projects/iceoderai.html" class="btn-details-dark">View Details →</a>
+                        <div class="card-meta" style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #ddd; font-size: 0.82rem; color: #666;"><div><strong>Active:</strong> Jul 2025 — Feb 2026</div><div style="margin-top: 4px;"><em>GPT-4 Vision + screenshot is the fastest path to an 'agent that sees your screen'.</em></div></div>
+                    <a href="projects/iceoderai.html" class="btn-details-dark">View Details →</a>
+                    </div>
+                </div>
                     </div>
                 </div>
 
-                <!-- Project 3: SPX Trading -->
+                <!-- ========== BROWSER & WEB AUTOMATION ========== -->
+                <div class="project-category">
+                    <h3 class="category-title">Browser & Web Automation</h3>
+                    <p class="category-subtitle">Browser-driven AI workflows</p>
+                    <div class="projects-grid"><!-- ========== TRADING AI ========== -->
+                <div class="project-category">
+                    <h3 class="category-title">Trading AI</h3>
+                    <p class="category-subtitle">Real-time market prediction</p>
+                    <div class="projects-grid">
+<!-- Project 3: SPX Trading -->
                 <div class="project-card">
                     <div class="project-badge">90% Accuracy</div>
                     <h3 class="project-title has-tooltip"><a href="projects/spx.html" class="project-link">SPX Trading System</a>
@@ -205,71 +469,48 @@
                         <span class="tech-badge">ThetaData</span>
                         <span class="tech-badge">OpenAI</span>
                     </div>
+                    <div class="card-meta" style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #ddd; font-size: 0.82rem; color: #666;"><div><strong>Active:</strong> Jun 2025 — Feb 2026</div><div style="margin-top: 4px;"><em>Lookahead bias is the silent killer of trading models; triple-barrier solves it.</em></div></div>
                     <a href="projects/spx.html" class="btn-details">View Details →</a>
                 </div>
+                    </div>
+                </div>
 
-                <!-- Project 4: LinkedIn Automation -->
+                <!-- ========== MEDIA & CONTENT AI ========== -->
+                <div class="project-category">
+                    <h3 class="category-title">Media & Content AI</h3>
+                    <p class="category-subtitle">Audio, video, and content processing</p>
+                    <div class="projects-grid">
+<!-- Project 7: Voice Clone -->
                 <div class="project-card">
-                    <div class="project-badge">95% Cost Reduction</div>
-                    <h3 class="project-title has-tooltip"><a href="projects/linkedin.html" class="project-link">LinkedIn Job Automation</a>
+                    <div class="project-badge">Complete</div>
+                    <h3 class="project-title has-tooltip"><a href="projects/voice-clone.html" class="project-link">Voice Clone System</a>
                         <div class="tooltip">
-                            <strong>Self-Learning Job Application System</strong>
-                            <p>Intelligent automation with 95% token reduction vs traditional approaches.</p>
+                            <strong>Concatenative Voice Synthesis</strong>
+                            <p>Voice cloning system using only the target speaker's actual voice samples.</p>
                             <ul>
-                                <li><strong>Smart Targeting:</strong> 50 tokens vs 2,500 traditional (95% reduction)</li>
-                                <li><strong>Element Registry:</strong> 150+ LinkedIn UI elements auto-discovered</li>
-                                <li><strong>Self-Learning:</strong> Adapts to new UI patterns automatically</li>
-                                <li><strong>Cost Efficient:</strong> $0.03-$0.05 per session vs $1.25 traditional</li>
+                                <li><strong>Speaker ID:</strong> Automatically identifies target speaker from video</li>
+                                <li><strong>Voice Separation:</strong> Filters out interviewers and background</li>
+                                <li><strong>Word Library:</strong> 306 unique words, 672 word versions extracted</li>
+                                <li><strong>High Quality:</strong> 48kHz sample rate with proper fade in/out</li>
                             </ul>
-                            <span class="tooltip-tech">Python • Playwright • OpenAI • Browser-Use</span>
+                            <span class="tooltip-tech">Python • Audio Processing • Speaker ID • Synthesis</span>
                         </div>
                     </h3>
-                    <p class="project-description">Self-learning job application system with 95% token reduction. Smart element targeting, auto-discovered UI registry of 150+ elements.</p>
+                    <p class="project-description">Voice cloning using concatenative synthesis. Speaker identification, voice separation, word library of 306 unique words from source audio.</p>
                     <div class="project-metrics">
-                        <span class="metric"><strong>95%</strong> Token Reduction</span>
-                        <span class="metric"><strong>$0.03</strong> Per Session</span>
-                        <span class="metric"><strong>150+</strong> UI Elements</span>
+                        <span class="metric"><strong>306</strong> Words</span>
+                        <span class="metric"><strong>672</strong> Versions</span>
+                        <span class="metric"><strong>48kHz</strong> Quality</span>
                     </div>
                     <div class="project-tech">
                         <span class="tech-badge">Python</span>
-                        <span class="tech-badge">Playwright</span>
-                        <span class="tech-badge">OpenAI</span>
-                        <span class="tech-badge">Browser-Use</span>
+                        <span class="tech-badge">Audio Processing</span>
+                        <span class="tech-badge">Speaker ID</span>
                     </div>
-                    <a href="projects/linkedin.html" class="btn-details">View Details →</a>
+                    <div class="card-meta" style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #ddd; font-size: 0.82rem; color: #666;"><div><strong>Active:</strong> Nov 2024 — Feb 2026</div><div style="margin-top: 4px;"><em>You don't need a neural vocoder if you have enough source words.</em></div></div>
+                    <a href="projects/voice-clone.html" class="btn-details">View Details →</a>
                 </div>
-
-                <!-- Project 5: WhatsApp Summarizer -->
-                <div class="project-card">
-                    <div class="project-badge">100% Success Rate</div>
-                    <h3 class="project-title has-tooltip"><a href="projects/whatsapp.html" class="project-link">WhatsApp Summarizer</a>
-                        <div class="tooltip">
-                            <strong>3-Agent Automation System</strong>
-                            <p>Fully automated WhatsApp conversation capture and AI summarization.</p>
-                            <ul>
-                                <li><strong>Agent 1 (Controller):</strong> WhatsApp navigation, group selection, scrolling</li>
-                                <li><strong>Agent 2 (Capture):</strong> Synchronized screenshot capture</li>
-                                <li><strong>Agent 3 (Analyzer):</strong> GPT-4 Vision real-time analysis</li>
-                                <li><strong>100% Success:</strong> Comprehensive end-to-end testing passed</li>
-                            </ul>
-                            <span class="tooltip-tech">Python • GPT-4 Vision • Multi-Agent • Automation</span>
-                        </div>
-                    </h3>
-                    <p class="project-description">3-agent automation system for WhatsApp conversation capture and AI summarization. Controller, screenshot taker, and GPT-4 Vision analyzer.</p>
-                    <div class="project-metrics">
-                        <span class="metric"><strong>3</strong> Agents</span>
-                        <span class="metric"><strong>100%</strong> Success</span>
-                        <span class="metric"><strong>&lt;1min</strong> Per Group</span>
-                    </div>
-                    <div class="project-tech">
-                        <span class="tech-badge">Python</span>
-                        <span class="tech-badge">GPT-4 Vision</span>
-                        <span class="tech-badge">Multi-Agent</span>
-                    </div>
-                    <a href="projects/whatsapp.html" class="btn-details">View Details →</a>
-                </div>
-
-                <!-- Project 6: YouTube AI Suite -->
+<!-- Project 6: YouTube AI Suite -->
                 <div class="project-card">
                     <div class="project-badge">Production</div>
                     <h3 class="project-title has-tooltip"><a href="projects/youtube.html" class="project-link">YouTube AI Suite</a>
@@ -297,109 +538,42 @@
                         <span class="tech-badge">GPT-4</span>
                         <span class="tech-badge">YouTube API</span>
                     </div>
+                    <div class="card-meta" style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #ddd; font-size: 0.82rem; color: #666;"><div><strong>Active:</strong> Jun 2025 — Feb 2026</div><div style="margin-top: 4px;"><em>$0.002/video is the right unit cost for content tools.</em></div></div>
                     <a href="projects/youtube.html" class="btn-details">View Details →</a>
                 </div>
-
-                <!-- Project 7: Voice Clone -->
+                <!-- Small AI Tools -->
                 <div class="project-card">
-                    <div class="project-badge">Complete</div>
-                    <h3 class="project-title has-tooltip"><a href="projects/voice-clone.html" class="project-link">Voice Clone System</a>
+                    <div class="project-badge">6 Utilities</div>
+                    <h3 class="project-title has-tooltip"><a href="projects/small-ai-tools.html" class="project-link">Small AI Tools</a>
                         <div class="tooltip">
-                            <strong>Concatenative Voice Synthesis</strong>
-                            <p>Voice cloning system using only the target speaker's actual voice samples.</p>
+                            <strong>Six small AI utilities, one shared pattern</strong>
+                            <p>TubeBrain, Moltbot, PDF Form Filler, Defender, WhatsApp Summarizer, YouTube News Feed &mdash; LLM + targeted I/O + minimal infra.</p>
                             <ul>
-                                <li><strong>Speaker ID:</strong> Automatically identifies target speaker from video</li>
-                                <li><strong>Voice Separation:</strong> Filters out interviewers and background</li>
-                                <li><strong>Word Library:</strong> 306 unique words, 672 word versions extracted</li>
-                                <li><strong>High Quality:</strong> 48kHz sample rate with proper fade in/out</li>
+                                <li><strong>TubeBrain:</strong> YouTube transcript &rarr; summary &rarr; word cloud</li>
+                                <li><strong>Moltbot:</strong> Chat bot for a focused use case</li>
+                                <li><strong>PDF Form Filler:</strong> LLM-driven form completion</li>
+                                <li><strong>Defender:</strong> Personal security utility</li>
+                                <li><strong>WhatsApp Summarizer:</strong> Daily group digest</li>
+                                <li><strong>YouTube News Feed:</strong> AI-curated subscriptions</li>
                             </ul>
-                            <span class="tooltip-tech">Python • Audio Processing • Speaker ID • Synthesis</span>
+                            <span class="tooltip-tech">Python &middot; GPT-4 &middot; Claude &middot; Single-purpose</span>
                         </div>
                     </h3>
-                    <p class="project-description">Voice cloning using concatenative synthesis. Speaker identification, voice separation, word library of 306 unique words from source audio.</p>
+                    <p class="project-description">Six small AI utilities that solve one problem each &mdash; bundled because they share an architecture: LLM + targeted I/O + minimal infra.</p>
                     <div class="project-metrics">
-                        <span class="metric"><strong>306</strong> Words</span>
-                        <span class="metric"><strong>672</strong> Versions</span>
-                        <span class="metric"><strong>48kHz</strong> Quality</span>
+                        <span class="metric"><strong>6</strong> Tools</span>
+                        <span class="metric"><strong>GPT-4 + Claude</strong></span>
+                        <span class="metric"><strong>Single-purpose</strong></span>
                     </div>
                     <div class="project-tech">
                         <span class="tech-badge">Python</span>
-                        <span class="tech-badge">Audio Processing</span>
-                        <span class="tech-badge">Speaker ID</span>
+                        <span class="tech-badge">GPT-4</span>
+                        <span class="tech-badge">Claude</span>
+                        <span class="tech-badge">Flask</span>
                     </div>
-                    <a href="projects/voice-clone.html" class="btn-details">View Details →</a>
+                    <div class="card-meta" style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #ddd; font-size: 0.82rem; color: #666;"><div><strong>Active:</strong> Jan 2026 — Feb 2026</div><div style="margin-top: 4px;"><em>Small focused tools that scratch one itch beat a single mega-tool.</em></div></div>
+                    <a href="projects/small-ai-tools.html" class="btn-details">View Details →</a>
                 </div>
-
-                <!-- Project 8: DBValidator -->
-                <div class="project-card">
-                    <div class="project-badge">Production</div>
-                    <h3 class="project-title has-tooltip">
-                        <a href="projects/dbvalidator.html" class="project-link-dark">DBValidator</a>
-                        <div class="tooltip">
-                            <strong>Multi-Platform Database Validation</strong>
-                            <p>Intelligent database validation tool with 4 matching modes.</p>
-                            <ul>
-                                <li><strong>Exact Match:</strong> Row-by-row comparison with hash validation</li>
-                                <li><strong>Selective:</strong> Compare specific columns with tolerance</li>
-                                <li><strong>DQ Rules:</strong> Data quality rule-based validation</li>
-                                <li><strong>Adaptive:</strong> Handle transformations during migration</li>
-                                <li><strong>122 Tests:</strong> 90 unit + 32 integration tests</li>
-                            </ul>
-                            <span class="tooltip-tech">Python • Oracle • Databricks • Snowflake • PostgreSQL</span>
-                        </div>
-                    </h3>
-                    <p class="project-description">Multi-platform database validation with 4 modes: Exact Match, Selective, DQ Rules, Adaptive. Supports Oracle, Databricks, Snowflake, PostgreSQL.</p>
-                    <div class="project-metrics">
-                        <span class="metric"><strong>122</strong> Tests</span>
-                        <span class="metric"><strong>4</strong> Modes</span>
-                        <span class="metric"><strong>5</strong> Platforms</span>
-                    </div>
-                    <div class="project-tech">
-                        <span class="tech-badge">Python</span>
-                        <span class="tech-badge">Oracle</span>
-                        <span class="tech-badge">Databricks</span>
-                        <span class="tech-badge">Snowflake</span>
-                    </div>
-                    <a href="projects/dbvalidator.html" class="btn-details">View Details →</a>
-                </div>
-
-                <!-- Project 9: BAMPFA CMS -->
-                <div class="project-card-showcase">
-                    <div class="showcase-preview">
-                        <img src="images/projects/bampfa-preview.png" alt="BAMPFA CMS - Berkeley Art Museum Database Modernization" class="showcase-image clickable-image" onclick="openLightbox(this.src)">
-                    </div>
-                    <div class="showcase-content">
-                        <div class="project-badge">Live CMS</div>
-                        <h3 class="project-title has-tooltip">
-                            <a href="projects/bampfa.html" class="project-link-dark">BAMPFA CMS</a>
-                            <div class="tooltip">
-                                <strong>Berkeley Art Museum Database Modernization</strong>
-                                <p>Comprehensive database architecture and CMS replacing outdated Drupal 7 system for BAMPFA.</p>
-                                <ul>
-                                    <li><strong>Unified 3 Systems:</strong> FileMaker, CollectionSpace, Tessitura integration</li>
-                                    <li><strong>53-Table Schema:</strong> PostgreSQL 16 with optimized architecture</li>
-                                    <li><strong>Flask CMS:</strong> Role-based access, workflows, audit trails</li>
-                                    <li><strong>Production Ready:</strong> Live on Digital Ocean with daily backups</li>
-                                    <li><strong>Media Management:</strong> Centralized file handling with metadata</li>
-                                </ul>
-                                <span class="tooltip-tech">PostgreSQL • Python • Flask • Nginx • Digital Ocean</span>
-                            </div>
-                        </h3>
-                        <p class="project-tagline-dark">Database Modernization for Berkeley Art Museum</p>
-                        <p class="project-description">Comprehensive CMS and database architecture unifying 3 legacy systems (FileMaker, CollectionSpace, Tessitura) into scalable PostgreSQL platform. Complete content workflows, audit trails, and role-based access.</p>
-                        <div class="project-metrics">
-                            <span class="metric"><strong>53</strong> Tables</span>
-                            <span class="metric"><strong>3</strong> Systems Unified</span>
-                            <span class="metric"><strong>Phase 4</strong> Complete</span>
-                        </div>
-                        <div class="project-tech">
-                            <span class="tech-badge">PostgreSQL 16</span>
-                            <span class="tech-badge">Python</span>
-                            <span class="tech-badge">Flask</span>
-                            <span class="tech-badge">Nginx</span>
-                            <span class="tech-badge">Digital Ocean</span>
-                        </div>
-                        <a href="projects/bampfa.html" class="btn-details-dark">View Details →</a>
                     </div>
                 </div>
             </div>
@@ -409,50 +583,113 @@
     <!-- Tech Stack Section -->
     <section id="tech" class="tech-stack">
         <div class="container">
-            <h2 class="section-title">Tech Stack</h2>
+            <h2 class="section-title">Tech Stack &amp; Tools</h2>
+            <p class="section-subtitle">Everything used across the 15 projects above</p>
             <div class="tech-categories">
                 <div class="tech-category">
-                    <h3>AI/ML</h3>
+                    <h3>LLMs &amp; AI Models</h3>
                     <div class="tech-list">
-                        <span>OpenAI GPT-4</span>
-                        <span>Amazon Bedrock</span>
-                        <span>RAG Pipelines</span>
-                        <span>LangChain</span>
-                        <span>MLflow</span>
-                        <span>Computer Vision</span>
+                        <span><a href="https://www.anthropic.com/news/claude-opus-4-7" target="_blank" rel="noopener">Claude Opus 4.7</a></span>
+                        <span><a href="https://www.anthropic.com/news/claude-sonnet-4-6" target="_blank" rel="noopener">Claude Sonnet 4.6</a></span>
+                        <span><a href="https://www.anthropic.com/news/claude-haiku-4-5" target="_blank" rel="noopener">Claude Haiku 4.5</a></span>
+                        <span><a href="https://openai.com/index/gpt-4/" target="_blank" rel="noopener">GPT-4</a></span>
+                        <span><a href="https://openai.com/index/gpt-4v-system-card/" target="_blank" rel="noopener">GPT-4 Vision</a></span>
+                        <span><a href="https://gemini.google.com/" target="_blank" rel="noopener">Gemini</a></span>
+                        <span><a href="https://ollama.com/" target="_blank" rel="noopener">Ollama (local)</a></span>
+                        <span><a href="https://openai.com/index/whisper/" target="_blank" rel="noopener">OpenAI Whisper</a></span>
                     </div>
                 </div>
                 <div class="tech-category">
-                    <h3>Data Platforms</h3>
+                    <h3>AI Patterns</h3>
                     <div class="tech-list">
-                        <span>Databricks</span>
-                        <span>Snowflake</span>
-                        <span>Spark</span>
-                        <span>Trino</span>
-                        <span>Airflow</span>
-                        <span>Delta Lake</span>
+                        <span><a href="https://www.anthropic.com/news/contextual-retrieval" target="_blank" rel="noopener">RAG Pipelines</a></span>
+                        <span><a href="https://en.wikipedia.org/wiki/Multi-agent_system" target="_blank" rel="noopener">Multi-Agent Systems</a></span>
+                        <span><a href="https://modelcontextprotocol.io/" target="_blank" rel="noopener">MCP Servers</a></span>
+                        <span><a href="https://en.wikipedia.org/wiki/Vector_database" target="_blank" rel="noopener">Vector DBs</a></span>
+                        <span><a href="https://en.wikipedia.org/wiki/Knowledge_base" target="_blank" rel="noopener">Knowledge Bases</a></span>
+                        <span><a href="https://en.wikipedia.org/wiki/Semantic_search" target="_blank" rel="noopener">Semantic Search</a></span>
+                        <span><a href="https://en.wikipedia.org/wiki/Speech_synthesis" target="_blank" rel="noopener">Voice Synthesis</a></span>
+                        <span><a href="https://platform.openai.com/docs/guides/fine-tuning" target="_blank" rel="noopener">Fine-Tuning</a></span>
                     </div>
                 </div>
                 <div class="tech-category">
                     <h3>Languages</h3>
                     <div class="tech-list">
-                        <span>Python</span>
-                        <span>SQL</span>
-                        <span>TypeScript</span>
-                        <span>Scala</span>
-                        <span>Java</span>
-                        <span>PySpark</span>
+                        <span><a href="https://www.python.org/" target="_blank" rel="noopener">Python</a></span>
+                        <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank" rel="noopener">JavaScript</a></span>
+                        <span><a href="https://www.typescriptlang.org/" target="_blank" rel="noopener">TypeScript</a></span>
+                        <span><a href="https://en.wikipedia.org/wiki/SQL" target="_blank" rel="noopener">SQL</a></span>
+                        <span><a href="https://spark.apache.org/docs/latest/api/python/" target="_blank" rel="noopener">PySpark</a></span>
+                        <span><a href="https://www.gnu.org/software/bash/" target="_blank" rel="noopener">Bash</a></span>
+                        <span><a href="https://developer.mozilla.org/en-US/docs/Web/HTML" target="_blank" rel="noopener">HTML / CSS</a></span>
+                        <span><a href="https://www.php.net/" target="_blank" rel="noopener">PHP</a></span>
+                        <span><a href="https://www.rust-lang.org/" target="_blank" rel="noopener">Rust</a></span>
                     </div>
                 </div>
                 <div class="tech-category">
-                    <h3>Infrastructure</h3>
+                    <h3>Data &amp; ML Platforms</h3>
                     <div class="tech-list">
-                        <span>AWS</span>
-                        <span>Kubernetes</span>
-                        <span>Docker</span>
-                        <span>Terraform</span>
-                        <span>PostgreSQL</span>
-                        <span>Redis</span>
+                        <span><a href="https://www.databricks.com/" target="_blank" rel="noopener">Databricks</a></span>
+                        <span><a href="https://www.snowflake.com/" target="_blank" rel="noopener">Snowflake</a></span>
+                        <span><a href="https://aws.amazon.com/redshift/" target="_blank" rel="noopener">Redshift</a></span>
+                        <span><a href="https://www.databricks.com/product/unity-catalog" target="_blank" rel="noopener">Unity Catalog</a></span>
+                        <span><a href="https://www.getdbt.com/" target="_blank" rel="noopener">dbt</a></span>
+                        <span><a href="https://spark.apache.org/" target="_blank" rel="noopener">Spark</a></span>
+                        <span><a href="https://mlflow.org/" target="_blank" rel="noopener">MLflow</a></span>
+                        <span><a href="https://delta.io/" target="_blank" rel="noopener">Delta Lake</a></span>
+                        <span><a href="https://airflow.apache.org/" target="_blank" rel="noopener">Airflow</a></span>
+                    </div>
+                </div>
+                <div class="tech-category">
+                    <h3>Databases</h3>
+                    <div class="tech-list">
+                        <span><a href="https://www.postgresql.org/" target="_blank" rel="noopener">PostgreSQL</a></span>
+                        <span><a href="https://www.mongodb.com/" target="_blank" rel="noopener">MongoDB</a></span>
+                        <span><a href="https://aws.amazon.com/redshift/" target="_blank" rel="noopener">Redshift</a></span>
+                        <span><a href="https://www.snowflake.com/" target="_blank" rel="noopener">Snowflake</a></span>
+                        <span><a href="https://www.mysql.com/" target="_blank" rel="noopener">MySQL</a></span>
+                        <span><a href="https://www.sqlite.org/" target="_blank" rel="noopener">SQLite</a></span>
+                        <span><a href="https://www.vertica.com/" target="_blank" rel="noopener">Vertica</a></span>
+                        <span><a href="https://www.oracle.com/database/" target="_blank" rel="noopener">Oracle</a></span>
+                    </div>
+                </div>
+                <div class="tech-category">
+                    <h3>Cloud &amp; Infra</h3>
+                    <div class="tech-list">
+                        <span><a href="https://aws.amazon.com/" target="_blank" rel="noopener">AWS</a></span>
+                        <span><a href="https://azure.microsoft.com/" target="_blank" rel="noopener">Azure</a></span>
+                        <span><a href="https://www.digitalocean.com/" target="_blank" rel="noopener">Digital Ocean</a></span>
+                        <span><a href="https://nginx.org/" target="_blank" rel="noopener">Nginx</a></span>
+                        <span><a href="https://tailscale.com/" target="_blank" rel="noopener">Tailscale</a></span>
+                        <span><a href="https://www.docker.com/" target="_blank" rel="noopener">Docker</a></span>
+                        <span><a href="https://letsencrypt.org/" target="_blank" rel="noopener">Let's Encrypt</a></span>
+                        <span><a href="https://en.wikipedia.org/wiki/Cron" target="_blank" rel="noopener">cron</a></span>
+                    </div>
+                </div>
+                <div class="tech-category">
+                    <h3>Frameworks &amp; Libraries</h3>
+                    <div class="tech-list">
+                        <span><a href="https://fastapi.tiangolo.com/" target="_blank" rel="noopener">FastAPI</a></span>
+                        <span><a href="https://flask.palletsprojects.com/" target="_blank" rel="noopener">Flask</a></span>
+                        <span><a href="https://react.dev/" target="_blank" rel="noopener">React</a></span>
+                        <span><a href="https://www.electronjs.org/" target="_blank" rel="noopener">Electron</a></span>
+                        <span><a href="https://playwright.dev/" target="_blank" rel="noopener">Playwright</a></span>
+                        <span><a href="https://github.com/browser-use/browser-use" target="_blank" rel="noopener">browser-use</a></span>
+                        <span><a href="https://openpyxl.readthedocs.io/" target="_blank" rel="noopener">openpyxl</a></span>
+                        <span><a href="https://github.com/amueller/word_cloud" target="_blank" rel="noopener">WordCloud</a></span>
+                    </div>
+                </div>
+                <div class="tech-category">
+                    <h3>APIs &amp; Integrations</h3>
+                    <div class="tech-list">
+                        <span><a href="https://developers.notion.com/" target="_blank" rel="noopener">Notion API</a></span>
+                        <span><a href="https://developers.google.com/drive" target="_blank" rel="noopener">Google Drive API</a></span>
+                        <span><a href="https://developers.google.com/calendar" target="_blank" rel="noopener">Google Calendar API</a></span>
+                        <span><a href="https://developers.google.com/youtube" target="_blank" rel="noopener">YouTube API</a></span>
+                        <span><a href="https://www.plaud.ai/" target="_blank" rel="noopener">Plaud Recorder</a></span>
+                        <span><a href="https://web.whatsapp.com/" target="_blank" rel="noopener">WhatsApp Web</a></span>
+                        <span><a href="https://www.linkedin.com/" target="_blank" rel="noopener">LinkedIn (via Playwright)</a></span>
+                        <span><a href="https://www.thetadata.net/" target="_blank" rel="noopener">ThetaData</a></span>
                     </div>
                 </div>
             </div>
@@ -495,5 +732,59 @@
     </div>
 
     <script src="js/main.js"></script>
+
+    <script>
+        // Project card filter
+        (function() {
+            // Map slugs to filter tags
+            const cardData = {
+                'bampfa': ['enterprise', 'postgres', 'python'],
+                'dbvalidator': ['enterprise', 'databricks', 'postgres', 'python'],
+                'dbsql-agent': ['enterprise', 'databricks', 'mcp', 'python'],
+                'cars180': ['enterprise', 'postgres', 'python'],
+                'gajadata': ['personal', 'claude'],
+                'voice-to-action': ['personal', 'claude', 'python'],
+                'claude-infra': ['personal', 'claude'],
+                'iceoderai': ['personal', 'gpt-4'],
+                'linkedin': ['browser', 'playwright', 'gpt-4', 'python'],
+                'whatsapp': ['browser', 'gpt-4', 'python'],
+                'browser-automation': ['browser', 'playwright', 'python'],
+                'spx': ['trading', 'gpt-4', 'python'],
+                'voice-clone': ['media', 'python'],
+                'youtube': ['media', 'gpt-4', 'python'],
+                'small-ai-tools': ['media', 'gpt-4', 'claude', 'python'],
+            };
+            const chips = document.querySelectorAll('.filter-chip');
+            const projectCards = document.querySelectorAll('.project-card, .project-card-showcase');
+            // Tag each card with data-tags
+            projectCards.forEach(card => {
+                const link = card.querySelector('a[href^="projects/"]');
+                if (!link) return;
+                const slug = link.getAttribute('href').replace('projects/', '').replace('.html', '');
+                const tags = cardData[slug] || [];
+                card.setAttribute('data-tags', tags.join(' '));
+                card.setAttribute('data-slug', slug);
+            });
+            chips.forEach(chip => {
+                chip.addEventListener('click', () => {
+                    chips.forEach(c => c.classList.remove('active'));
+                    chip.classList.add('active');
+                    const filter = chip.dataset.filter;
+                    projectCards.forEach(card => {
+                        const tags = (card.getAttribute('data-tags') || '').split(' ');
+                        const shouldShow = (filter === 'all' || tags.includes(filter));
+                        card.setAttribute('data-hidden', shouldShow ? 'false' : 'true');
+                    });
+                    // Hide empty categories
+                    document.querySelectorAll('.project-category').forEach(cat => {
+                        const visible = Array.from(cat.querySelectorAll('.project-card, .project-card-showcase'))
+                            .filter(c => c.getAttribute('data-hidden') !== 'true').length;
+                        cat.setAttribute('data-hidden', visible === 0 ? 'true' : 'false');
+                    });
+                });
+            });
+        })();
+    </script>
+
 </body>
 </html>

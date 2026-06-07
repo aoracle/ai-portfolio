@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browser Automation Toolkit | AI Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/project-page.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">AI Portfolio</a>
+            <ul class="nav-menu">
+                <li><a href="../index.html#projects">All Projects</a></li>
+                <li><a href="../index.html#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="project-header">
+        <div class="container">
+            <a href="../index.html#projects" class="back-link">&larr; Back to Projects</a>
+            <h1 class="project-page-title">Browser Automation Toolkit</h1>
+            <p class="project-page-tagline">An optimized fork of browser-use paired with a custom Chromium devtools panel for inspecting, debugging, and benchmarking LLM-driven browser sessions end-to-end.</p>
+            <div class="project-page-badges">
+                <span class="badge">Playwright + Chromium</span>
+                <span class="badge">LLM-driven</span>
+                <span class="badge">Custom DevTools</span>
+                <span class="badge">Token-optimized</span>
+                <span class="badge">LLM-as-Judge Evals</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="project-content">
+        <div class="container">
+            <div class="readme-content">
+
+                <p class="lead">LLM-driven browser agents look magical for ten seconds and then fall apart the moment you put them in front of a real workload. The popular libraries are easy to install, but they rebuild the DOM on every step, spin up a fresh browser per task, and give you almost no way to see <em>why</em> the agent clicked what it clicked. I rebuilt the parts that hurt. This toolkit is two halves &mdash; an optimized fork of <code>browser-use</code> that makes the runtime cheap enough to actually use, and a custom Chromium DevTools panel that lets me watch the agent reason in real time and grade its runs with an LLM-as-judge harness.</p>
+
+                <h2>The Problem I Was Solving</h2>
+
+                <p>I use browser agents for unglamorous, high-frequency work: scraping job boards, filling structured applications, mining LinkedIn DMs, mirroring data out of SaaS dashboards that have no API, and running end-to-end checks on internal tools at clients. Off-the-shelf <code>browser-use</code> handles the demo cases beautifully &mdash; "compare two prices," "book a flight" &mdash; but three things break when you point it at real workflows.</p>
+
+                <p><strong>It is slow.</strong> Every agent step re-extracts the entire DOM, ships a screenshot, and walks the page tree again, even when the page hasn't changed in the last second. On a multi-step task that's hundreds of milliseconds wasted per step and a multiplied token bill.</p>
+
+                <p><strong>It is leaky.</strong> Long-running sessions drift upward in memory until they OOM. Browser contexts don't get reused, so each task pays a 2-3 second startup tax. Transient network blips cascade into hard failures because the retry story is anaemic.</p>
+
+                <p><strong>It is opaque.</strong> When the agent does the wrong thing &mdash; clicks the wrong button, hallucinates a selector, hands a stale screenshot to the model &mdash; there is no good place to stand and watch. Stdout logs are the entire debugging surface. I needed a real inspector, the way a frontend engineer uses Chrome DevTools, but for an LLM driving the page.</p>
+
+                <p>The two halves of this toolkit are the answers to those three problems: the optimized runtime fixes "slow" and "leaky", and the custom DevTools panel fixes "opaque."</p>
+
+                <h2>System Architecture</h2>
+
+                <p>The two components are independent but designed to compose. The optimized runtime runs the agent loop. The DevTools panel attaches to the same Chromium instance over the Chrome DevTools Protocol (CDP) and observes everything the agent sees and decides. A WebSocket-based evaluation server sits beside both and runs scored test tasks against the agent as an LLM judge.</p>
+
+<pre><code>┌──────────────────────────────────────────────────────────────────┐
+│  Task prompt   (e.g. "find ML jobs and draft applications")     │
+└──────────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+┌──────────────────────────────────────────────────────────────────┐
+│  AGENT LOOP  (browser-use-optimized)                            │
+│  ┌────────────┐    ┌──────────────┐    ┌────────────────────┐   │
+│  │ LLM (4o /  │ ◀─▶│  Controller  │ ◀─▶│  DOM Service       │   │
+│  │  Claude /  │    │  + Action    │    │  + Cache (TTL=2s)  │   │
+│  │  local)    │    │  Registry    │    │  + Selector Map    │   │
+│  └────────────┘    └──────────────┘    └────────────────────┘   │
+│         ▲                  ▲                     ▲              │
+│         │                  │                     │              │
+│         │            ┌─────┴──────┐        ┌─────┴───────┐      │
+│         │            │ Browser    │        │ Memory Mgr  │      │
+│         │            │ Pool       │        │ + GC hooks  │      │
+│         │            └─────┬──────┘        └─────────────┘      │
+└─────────┼──────────────────┼────────────────────────────────────┘
+          │                  │
+          │                  ▼
+          │      ┌───────────────────────────┐
+          │      │  Chromium  (Playwright)   │ ◀──┐
+          │      └───────────────┬───────────┘    │
+          │                      │ CDP            │ CDP
+          ▼                      ▼                │
+┌─────────────────────┐   ┌─────────────────────────────────────┐
+│  Eval Server        │   │  Browser Operator DevTools Panel    │
+│  (WebSocket)        │   │  - Multi-agent orchestrator view    │
+│  - LLM-as-judge     │   │  - Agent step timeline              │
+│  - Scored runs      │   │  - DOM + screenshot diff            │
+│  - JSONL audit log  │   │  - Tool registry inspector          │
+└─────────────────────┘   └─────────────────────────────────────┘</code></pre>
+
+                <p>The agent loop is the hot path. The DevTools panel is a passive observer that piggybacks on Chromium's own protocol &mdash; it doesn't slow the agent down, it just watches. The eval server is invoked when I want to grade a run, not on every step. Each piece stays in its own lane.</p>
+
+                <h2>Component 1 &mdash; The Optimized Agent Runtime</h2>
+
+                <p>The base library, <code>browser-use</code>, is a Python &gt;= 3.11 async library that turns an LLM into a browser driver via Playwright. The agent loop is roughly: take a screenshot, extract the DOM, build a numbered list of interactive elements, feed the list and the screenshot to an LLM, parse the LLM's chosen action, dispatch it through Playwright, repeat. The architecture is clean. The defaults are not tuned for cost.</p>
+
+                <p>My fork lives at <code>browser-use-optimized/</code> and changes five things, each with a measurable benchmark.</p>
+
+                <h3>1. DOM cache with TTL + LRU</h3>
+
+                <p>The biggest single win. Full DOM extraction on a realistic page is ~200ms of JavaScript execution plus a Python pass to convert the result into a typed tree. Within a single agent step the same DOM may be requested two or three times. I added a TTL-based cache keyed by URL + viewport + extraction parameters, with LRU eviction and weak-reference page tracking so cache entries die when their page does.</p>
+
+<pre><code># cache key — URL + flags + viewport so semantically distinct
+# requests against the same page don't collide
+key = hashlib.md5(
+    f"{page.url}|{highlight}|{focus}|{viewport}".encode()
+).hexdigest()
+
+# Workflow 2.x: cache hit returns in ~3ms instead of ~200ms
+# Workflow 1.x: cache miss → full extraction, then store
+# Workflow 5.x: empty/system page → minimal state, skip JS entirely</code></pre>
+
+                <p>Default TTL is 2 seconds &mdash; long enough to absorb intra-step churn, short enough to never serve a stale tree across a navigation. Result: ~70% reduction in DOM processing time and a ~30% drop in total step time on a typical multi-step task.</p>
+
+                <h3>2. Browser instance pool</h3>
+
+                <p>Cold-starting Chromium through Playwright is 2-3 seconds of overhead the agent doesn't get back. For parallel work (e.g. enriching 100 LinkedIn profiles in parallel) that overhead dominates. The pool keeps a small set of warm browsers alive and hands out fresh contexts on demand. Contexts are cheap; browsers are not.</p>
+
+<pre><code>from browser_use.browser.pool import get_browser_pool
+
+pool = get_browser_pool()
+await pool.initialize()
+
+async with pool.acquire_context() as (session, ctx):
+    page = await ctx.new_page()
+    # ...do work on the page...
+# pool reclaims the context here, the browser stays warm</code></pre>
+
+                <p>Bounded by an env var (<code>BROWSER_USE_MAX_BROWSERS</code>, default 5). Health-checked. Crashed browsers get evicted and replaced silently so the next acquire doesn't hand the caller a dead session.</p>
+
+                <h3>3. Memory manager with weak references</h3>
+
+                <p>Long-running agent processes leak. Screenshots pile up. Closed pages keep references. The memory manager monitors process RSS, fires registered cleanup callbacks at configurable thresholds, and tracks large objects via <code>weakref</code> so the GC can still reclaim them. The agent goes from drifting to ~2.5 GB over an hour to staying flat near 1 GB.</p>
+
+                <h3>4. Health checker + retry utils with circuit breaker</h3>
+
+                <p>The upstream library had a <code>@require_healthy_browser</code> decorator that did the right thing in principle but had subtle race conditions under concurrent load. I replaced it with a cached health check (2-second TTL, async-safe) and a separate retry layer with exponential backoff, jitter, and a circuit breaker so cascading failures don't pin a CPU.</p>
+
+<pre><code>from browser_use.retry_utils import retry_browser_operation
+
+@retry_browser_operation     # exp backoff + jitter + circuit breaker
+async def submit_form():
+    await page.click("#submit")</code></pre>
+
+                <p>Effect: ~90% drop in false-positive failures, sub-second recovery from transient errors.</p>
+
+                <h3>5. Async hygiene</h3>
+
+                <p>Pass over the codebase replacing sequential <code>await</code>s where the operations were independent (<code>asyncio.gather</code> over per-element work), switching file I/O to <code>aiofiles</code>, and tightening async context managers so a thrown exception still cleans up its page. Throughput on multi-step tasks improved ~40%.</p>
+
+                <h3>Numbers, end-to-end</h3>
+
+<pre><code>Operation                Baseline    Optimized    Delta
+DOM Tree Build           200 ms       60 ms       -70%
+Browser Cold Start      2500 ms      500 ms       -80%
+Memory Usage (1 hr)      2.5 GB      1.0 GB       -60%
+Error Recovery            10 s        1 s         -90%
+End-to-End Multi-step    45 s        27 s         -40%</code></pre>
+
+                <p>None of these are exotic techniques. They're the standard playbook for taking a research-quality library and making it production-shaped: cache, pool, bound, retry, parallelize.</p>
+
+                <h2>Component 2 &mdash; Browser Operator DevTools</h2>
+
+                <p>The second half of the toolkit is a Chromium devtools-frontend customization &mdash; a fork of the Chrome DevTools frontend with a new panel dedicated to LLM-driven browser agents. The DevTools frontend is a real frontend application (the same one you open with Cmd-Option-I), written largely in TypeScript and built with Chromium's GN/Ninja build system. I extended it with an AI Chat panel that hosts a multi-agent orchestrator and renders the agent's reasoning, actions, and intermediate state alongside the page being driven.</p>
+
+                <p>The mental model: instead of running an agent against a headless browser and tailing a log file, I run the agent inside a Chromium instance whose DevTools is itself the agent's control surface. The agent's "thought stream" is a tab. The page it's driving is the next tab over. They share a CDP connection.</p>
+
+                <p>The panel exposes three layers:</p>
+
+                <ul>
+                    <li><strong>Multi-agent orchestrator</strong>. A research agent, a navigation agent, and an analysis agent compose against a task. Each has its own tool registry and prompt template. The orchestrator routes between them.</li>
+                    <li><strong>Step-by-step timeline</strong>. Every agent decision becomes a row: the prompt sent, the model's reply, the selected tool, the resulting page state. Click a row and the corresponding DOM snapshot + screenshot loads inline. Useful for the question "why did it click that?"</li>
+                    <li><strong>Provider switcher</strong>. OpenAI, Anthropic Claude, Gemini, and a LiteLLM proxy for routing to local models (Ollama, llama.cpp). The same agent runs against any of them. This is how I A/B providers on the same task.</li>
+                </ul>
+
+                <p>Because the panel is a DevTools extension, it inherits everything Chromium already gives you for free: the network panel for inspecting API calls the agent made, the performance panel for finding slow steps, the elements panel for confirming the agent's selector resolved to the right node. The agent and the human debugger see the same browser.</p>
+
+                <h2>Component 3 &mdash; LLM-as-Judge Evaluation Server</h2>
+
+                <p>The third piece, in <code>browser-operator-devtools/eval-server/</code>, is a small Node.js WebSocket server that orchestrates scored evaluations. The agent connects, the server sends it a task, the agent returns an answer, and a separate "judge" LLM (GPT-4 class) scores the answer against a YAML-defined rubric.</p>
+
+<pre><code># test rubric (YAML)
+task: "Find the top 3 cheapest direct flights from SFO to JFK
+       next Friday and return them as JSON."
+judge_prompt: |
+  Score 0-10 on: (a) exactly 3 results returned,
+  (b) all are direct, (c) prices verified against the source page,
+  (d) JSON is well-formed.
+models:
+  main_model: gpt-4.1
+  mini_model: gpt-4.1-nano</code></pre>
+
+                <p>Why this matters: agent quality is multidimensional and noisy. "It clicked the right button" tells me nothing about whether it solved the task. The eval server gives me a deterministic harness for asking "did the new caching layer regress task accuracy?" before I ship a change to the runtime. It also exposes an OpenAI-compatible <code>/v1/responses</code> endpoint, which lets me point existing tools at it as if it were any other model provider.</p>
+
+                <p>Results land as JSONL with the full prompt, reply, judge score, and tool trace &mdash; the same corpus shape I use elsewhere for model fine-tuning experiments.</p>
+
+                <h2>Why It Works &mdash; Design Decisions</h2>
+
+                <p><strong>Why fork browser-use instead of writing my own.</strong> The upstream architecture &mdash; LLM as planner, Playwright as effector, DOM service as the bridge &mdash; is correct. Rewriting it would have meant rebuilding the agent loop, the selector map, the controller registry, and the integration surface for half a dozen LLM providers. The runtime wins I needed (caching, pooling, retries) are layered concerns. They belong in a fork, not in a rewrite.</p>
+
+                <p><strong>Why custom DevTools instead of a separate web UI.</strong> A standalone web UI for inspecting agents is a debugger that doesn't see the page. The Chromium DevTools frontend already has world-class tooling for inspecting a live page; bolting an agent panel onto it means I never have to context-switch between "what the agent thinks" and "what the browser is actually doing." Both views share the same CDP connection.</p>
+
+                <p><strong>Why an LLM-as-judge eval server instead of pytest.</strong> The success criterion for a real task ("did it find good flights?") is not a string equality check. It's a graded judgement. An LLM judge with a clear rubric is the cheapest way to get a repeatable score; deterministic-where-possible (results count, JSON shape) and graded-where-not (relevance, price-vs-source).</p>
+
+                <p><strong>Why TTL caching instead of explicit invalidation.</strong> Explicit cache invalidation across an async system with iframes and JavaScript navigations is a bug factory. A 2-second TTL with weak-ref page tracking gets 95% of the speedup with effectively no correctness risk. The agent has never noticed the cache exists.</p>
+
+                <p><strong>Why a pool of warm browsers instead of one warm browser.</strong> Single-instance reuse caps your concurrency at one. A small bounded pool gives you parallelism with a hard memory ceiling. Choosing 5 as the default was empirical &mdash; that's where my laptop tops out before the system swap pressure starts to dominate.</p>
+
+                <h2>What I Learned</h2>
+
+                <p>The first-principles takeaway: <strong>most of the cost in agent runtimes is not the LLM call.</strong> It's the page-state extraction that feeds the LLM. Once I cached the DOM, pooled the browsers, and bounded the memory, the runtime cost collapsed and the LLM bill became the dominant line item &mdash; which is the regime where it actually pays to think about prompt optimization. Solving the wrong bottleneck first is the most common mistake I see in agent code.</p>
+
+                <p>The second takeaway: <strong>observability beats logging for non-deterministic systems.</strong> A log file tells you what happened. A DevTools panel tells you what the agent was looking at when it decided to do the thing. The difference is the difference between guessing and debugging. For anything driven by an LLM, the inspector matters more than the print statement.</p>
+
+                <p>The third takeaway: <strong>the layering is the product.</strong> The fork, the panel, and the eval server are three separate things that compose. Any one of them is useful alone. Together they form a closed feedback loop &mdash; optimize the runtime, watch the agent's behaviour change in the panel, score the change against the rubric, decide whether to keep it. That loop is the entire reason I built this.</p>
+
+                <h2>Tech Stack</h2>
+
+                <p><strong>Runtime fork (browser-use-optimized):</strong> Python 3.11+ (async, modern typing), Playwright, Pydantic v2, aiofiles, weakref, pytest + pytest-httpserver, uv for dependency management. Docker images for headless deployment (including a slimmer <code>Dockerfile.fast</code>). MCP client + server support, OpenAI / Anthropic / Gemini / DeepSeek / Grok / local LLM providers.</p>
+
+                <p><strong>DevTools panel (browser-operator-devtools):</strong> Chromium DevTools frontend (TypeScript), GN + Ninja build, CDP for browser introspection, multi-agent orchestrator pattern, local-LLM friendly (Ollama via LiteLLM proxy), BSD-3-Clause base.</p>
+
+                <p><strong>Evaluation server:</strong> Node.js, WebSocket for agent connections, OpenAI GPT-4 class model as judge, YAML-defined test rubrics, JSONL audit log, OpenAI-compatible <code>/v1/responses</code> endpoint for drop-in integration.</p>
+
+                <h2>Source</h2>
+
+                <p>The runtime fork is a layered patch over the upstream <code>browser-use</code> library; the DevTools customization is a fork of the upstream <code>browser-operator-devtools-frontend</code> project (BSD-3-Clause). My optimization patches, the DevTools panel customizations, and the eval rubrics live in private repos because they're entangled with workflows that touch personal accounts and client systems. Architectural patterns and the snippets above are representative of the production toolkit. Reach out if you'd like a deeper walk-through.</p>
+
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; Anand Mahajan &middot; <a href="../index.html">Back to portfolio</a></p>
+        </div>
+    </footer>
+</body>
+</html>

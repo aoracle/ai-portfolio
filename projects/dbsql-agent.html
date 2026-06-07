@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Databricks SQL Agent | AI Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/project-page.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">AI Portfolio</a>
+            <ul class="nav-menu">
+                <li><a href="../index.html#projects">All Projects</a></li>
+                <li><a href="../index.html#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="project-header">
+        <div class="container">
+            <a href="../index.html#projects" class="back-link">&larr; Back to Projects</a>
+            <h1 class="project-page-title">Databricks SQL Agent</h1>
+            <p class="project-page-tagline">A schema-aware natural-language SQL agent that turns plain-English questions into safe, optimized queries against a relational warehouse &mdash; with structured LLM output, hard safety guardrails, and an introspection layer that ingests the live schema instead of pretending it knows it.</p>
+            <div class="project-page-badges">
+                <span class="badge">Schema-Aware Prompting</span>
+                <span class="badge">Read-Only Guardrails</span>
+                <span class="badge">Structured JSON Output</span>
+                <span class="badge">Conversational Memory</span>
+                <span class="badge">Pluggable Warehouse</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="project-content">
+        <div class="container">
+            <div class="readme-content">
+
+                <p class="lead">Every "ChatGPT for your database" demo I've watched falls apart the same way: the LLM hallucinates a column, the user runs the query, the warehouse charges them for a full table scan, and somebody's dashboard quietly turns into a lie. I built this agent to be the opposite of that demo. It pulls the schema from <code>information_schema</code> at startup, hands the LLM a structured map of every table, column, foreign key, and view, forces a JSON-shaped response so I can validate before execution, and refuses anything that isn't a <code>SELECT</code> or <code>WITH</code>. The reference implementation runs against a PostgreSQL warehouse holding a real-world museum/gallery schema (53 tables, foreign-key-rich). The same architecture drops onto a Databricks SQL warehouse with no change to the agent loop.</p>
+
+                <h2>The Problem I Was Solving</h2>
+
+                <p>On the BAMPFA project I had a curator who could describe what she wanted &mdash; "show me every film by Kurosawa we've screened in the last three years, grouped by venue" &mdash; but no SQL. Her alternatives were waiting on a developer, navigating a Tableau cube someone built two years ago, or living without the answer. I wanted a fourth option: she types the question, the agent writes the SQL against the real schema, executes it read-only, and shows her the result with a plain-English explanation of what just happened.</p>
+
+                <p>The hard parts aren't the LLM. The hard parts are the things people skip in demos: (1) the model needs the <em>actual</em> schema, not a hand-written summary that drifts out of sync; (2) the model will absolutely write a <code>DELETE</code> if you don't physically stop it; (3) the response has to be parseable so my code can act on it &mdash; not a free-text essay; (4) when the LLM hallucinates a column name (and it will), the failure has to surface as a clean error message, not silent wrong data.</p>
+
+                <h2>System Architecture</h2>
+
+                <p>Four components, each replaceable. The agent loop is deliberately boring &mdash; the intelligence lives in the prompt and the schema context, not in framework magic.</p>
+
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│  User  (CLI / API / Streamlit)                                  │
+│    "Which curators have worked on the most exhibitions?"        │
+└─────────────────────────────────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────────────┐
+│  SQLAgent  (LangChain + ChatOpenAI, temperature=0.1)            │
+│    1. Build system prompt = schema context + safety rules       │
+│    2. Append last 4 turns of conversation history               │
+│    3. Call LLM, demand JSON: {query, explanation, reasoning}    │
+│    4. Parse JSON; fall back to SQL extraction if malformed      │
+└─────────────────────────────────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────────────┐
+│  Safety Gate  (settings.is_query_safe)                          │
+│    • Must start with SELECT or WITH                             │
+│    • Must NOT contain DROP/DELETE/UPDATE/INSERT/ALTER/CREATE    │
+│    • Rejects before the query ever touches the warehouse        │
+└─────────────────────────────────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────────────┐
+│  DatabaseManager  (SQLAlchemy, pool_pre_ping, schema-scoped)    │
+│    • SET search_path TO &lt;schema&gt; on every connection            │
+│    • Execute, cap rows at max_query_results                     │
+│    • Return DataFrame + row count + execution time              │
+└─────────────────────────────────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────────────┐
+│  Schema Introspection  (cached, lazy)                           │
+│    • Reads information_schema.tables / .columns / .key_*        │
+│    • Builds {tables, columns, foreign_keys, views} dict         │
+│    • Renders into a markdown system-prompt block                │
+└─────────────────────────────────────────────────────────────────┘</code></pre>
+
+                <p>The non-obvious decision: schema introspection runs once at startup, gets cached on the agent, and is re-rendered into the system prompt on every call. The LLM never sees the warehouse directly &mdash; it sees a structured markdown view of the warehouse that <em>my code</em> generated from live metadata. If a column is added tomorrow, restart the agent and the new column shows up in the prompt with no code change.</p>
+
+                <h2>Component 1 &mdash; Schema Introspection</h2>
+
+                <p>This is the foundation. The agent is only as smart as the schema context it gets. I read three <code>information_schema</code> views &mdash; tables, columns, and the join across <code>table_constraints / key_column_usage / constraint_column_usage</code> for foreign keys &mdash; then assemble them into a single nested dict that gets rendered into the LLM's system prompt.</p>
+
+<pre><code>fk_query = text("""
+    SELECT
+        tc.table_name,
+        kcu.column_name,
+        ccu.table_name AS foreign_table_name,
+        ccu.column_name AS foreign_column_name
+    FROM information_schema.table_constraints AS tc
+    JOIN information_schema.key_column_usage AS kcu
+        ON tc.constraint_name = kcu.constraint_name
+    JOIN information_schema.constraint_column_usage AS ccu
+        ON ccu.constraint_name = tc.constraint_name
+    WHERE tc.constraint_type = 'FOREIGN KEY'
+    AND tc.table_schema = :schema_name
+""")</code></pre>
+
+                <p>That last join &mdash; foreign keys &mdash; is the secret sauce. Without it, the LLM has no idea that <code>event_speakers.person_id</code> relates to <code>persons.id</code>. With it, the LLM writes correct JOINs on the first try. I render the FKs into the prompt with arrow notation the model parses natively:</p>
+
+<pre><code>### event_speakers
+Purpose: Maps speakers to events
+Columns:
+  - id: integer (not null)
+  - event_id: integer (not null)
+  - person_id: integer (not null)
+  - role: varchar (nullable)
+Foreign Keys:
+  - event_id → events.id
+  - person_id → persons.id</code></pre>
+
+                <p>The same approach works against Databricks SQL: Unity Catalog exposes the equivalent metadata via <code>system.information_schema.tables</code>, <code>columns</code>, and <code>constraint_column_usage</code>. Swap the connection string and the SQL dialect of the introspection queries; the agent loop doesn't change.</p>
+
+                <h2>Component 2 &mdash; Structured LLM Output</h2>
+
+                <p>I refuse to parse free-text responses. The system prompt demands JSON with three fields: <code>query</code>, <code>explanation</code>, <code>reasoning</code>. The LLM gets temperature 0.1 to stay deterministic. If the JSON parse fails, I have a fallback that extracts the first <code>SELECT ... ;</code> block from the text &mdash; but I treat the fallback as a smell and log it.</p>
+
+<pre><code>try:
+    response_data = json.loads(response.content)
+    query = response_data.get('query', '').strip()
+    explanation = response_data.get('explanation', '')
+    reasoning = response_data.get('reasoning', '')
+except json.JSONDecodeError:
+    # Fallback: best-effort SQL extraction
+    content = response.content
+    if 'SELECT' in content.upper():
+        lines, in_query, query_lines = content.split('\n'), False, []
+        for line in lines:
+            if 'SELECT' in line.upper() or in_query:
+                in_query = True
+                query_lines.append(line)
+                if line.strip().endswith(';'):
+                    break
+        query = '\n'.join(query_lines).strip()
+        explanation = "Query extracted from response"
+        reasoning = "Fallback parsing used"</code></pre>
+
+                <p>Why bother with the fallback? Because LLMs occasionally wrap JSON in markdown code fences, hallucinate a leading sentence, or drop a trailing comma. I'd rather degrade gracefully than throw on a glitch. But every fallback is a signal that the prompt needs to be tightened.</p>
+
+                <h2>Component 3 &mdash; The Safety Gate</h2>
+
+                <p>This is the smallest piece of code in the system and the one I trust most:</p>
+
+<pre><code>def is_query_safe(self, query: str) -> tuple[bool, Optional[str]]:
+    query_upper = query.upper().strip()
+
+    # Reject anything containing a blocked keyword
+    for keyword in self.blocked_keywords:    # DROP DELETE UPDATE INSERT ALTER TRUNCATE CREATE
+        if keyword in query_upper:
+            return False, f"Blocked keyword detected: {keyword}"
+
+    # Must start with SELECT or WITH
+    starts_with_allowed = any(
+        query_upper.startswith(op) for op in self.allowed_operations
+    )
+    if not starts_with_allowed:
+        return False, f"Query must start with one of: {', '.join(self.allowed_operations)}"
+
+    return True, None</code></pre>
+
+                <p>Three lines of real logic. No regex, no SQL parser, no clever AST analysis &mdash; just a substring check and a startswith check. This works because the layer behind it is also read-only by configuration: the warehouse user the agent connects with does not have write privileges. The gate is defense-in-depth, not the only line of defense.</p>
+
+                <p>Critically, the safety check runs <em>before</em> the query reaches the database driver. A query that fails the gate never opens a transaction, never bills compute, never appears in the warehouse audit log as a rejected statement. It's free.</p>
+
+                <h2>Component 4 &mdash; Conversational Memory</h2>
+
+                <p>The agent keeps the last 4 turns of conversation history in a ring buffer. This is what lets the user say "now group that by year" instead of restating the entire question. Token budget matters &mdash; I cap history at 10 messages and drop the oldest when the buffer fills:</p>
+
+<pre><code>self._conversation_history.extend([human_message, response])
+if len(self._conversation_history) > 10:
+    self._conversation_history = self._conversation_history[-10:]</code></pre>
+
+                <p>Schema context, on the other hand, lives in the <em>system</em> message every turn &mdash; it never rolls off. The user's follow-up always has the full schema in scope, regardless of how long the conversation runs.</p>
+
+                <h2>Component 5 &mdash; Execution and Result Shaping</h2>
+
+                <p>The database manager uses SQLAlchemy with <code>pool_pre_ping</code> (cheap liveness check) and <code>pool_recycle=300</code> (drop stale connections). Every query runs inside a connection block that first sets the search path to the configured schema &mdash; so the LLM doesn't need to qualify every table name with the schema prefix, keeping the generated SQL clean and portable.</p>
+
+<pre><code>with self.engine.connect() as conn:
+    conn.execute(text(f"SET search_path TO {settings.db_schema}"))
+    result = conn.execute(text(query))
+
+    if result.returns_rows:
+        df = pd.DataFrame(result.fetchall(), columns=result.keys())
+        if len(df) > settings.max_query_results:
+            df = df.head(settings.max_query_results)
+            warning = f"Results limited to {settings.max_query_results} rows"
+            return True, df, warning
+        return True, df, None</code></pre>
+
+                <p>Results come back as a pandas DataFrame, capped at <code>max_query_results</code> (default 100) so a missing <code>LIMIT</code> in an aggregation against a million-row table doesn't blow up memory. The CLI surface uses <code>rich</code> to render the DataFrame as a syntax-highlighted SQL block plus a result table &mdash; the demo experience matters because this is how I convince non-technical stakeholders the agent is real.</p>
+
+                <h2>Component 6 &mdash; Explain and Suggest</h2>
+
+                <p>Two side-features that punch above their weight: <code>explain_query()</code> takes an arbitrary SQL string and returns a plain-English description (useful when a developer wants to understand someone else's query), and <code>suggest_similar_queries()</code> takes the user's question and returns 3-5 follow-up questions. The suggestion feature is the one curators actually use &mdash; it turns the agent from a one-shot tool into a guided exploration session.</p>
+
+<pre><code>def suggest_similar_queries(self, question: str) -> List[str]:
+    system_message = SystemMessage(content="""
+    Based on the museum database schema and a user's question,
+    suggest 3-5 similar questions they might want to ask.
+    Focus on: related data exploration, different perspectives,
+    common analytical questions, questions that build on the current one.
+    Return suggestions as a simple list, one per line.""")
+
+    human_message = HumanMessage(
+        content=f"User asked: {question}\n\nSuggest similar questions:"
+    )
+    response = self.llm([system_message, human_message])
+    return [
+        line.strip().lstrip('•-*').strip()
+        for line in response.content.split('\n')
+        if line.strip() and not line.startswith('#')
+    ][:5]</code></pre>
+
+                <h2>Why It Works</h2>
+
+                <p>Five design choices keep the agent honest:</p>
+
+                <ol>
+                    <li><strong>Live schema beats hand-written context.</strong> The LLM is reading the warehouse as it exists right now, not a frozen description in a markdown file that someone forgot to update three sprints ago.</li>
+                    <li><strong>Structured JSON output beats freeform parsing.</strong> When I demand <code>{query, explanation, reasoning}</code>, I can validate, log, and route each field independently. The explanation lands in the audit trail; the query goes to the safety gate.</li>
+                    <li><strong>Layered safety.</strong> Keyword denylist at the application layer, read-only credentials at the warehouse layer, result-row cap at the result layer. Three independent failures would need to align for damage.</li>
+                    <li><strong>Foreign keys in the prompt.</strong> The single biggest accuracy lift came from rendering FK relationships into the system prompt. Without them, the LLM guesses joins; with them, it gets them right.</li>
+                    <li><strong>Conversation memory in the user channel, schema in the system channel.</strong> The schema is non-negotiable context; the conversation is best-effort context. Keeping them in different message types means I can prune the latter without touching the former.</li>
+                </ol>
+
+                <h2>What I Learned</h2>
+
+                <p>The first-principles lesson: <strong>the LLM is the cheapest, least reliable part of the system.</strong> Everything that makes this agent trustworthy &mdash; the schema introspection, the JSON validation, the safety gate, the connection pooling, the row caps &mdash; is plain engineering. The LLM is a translator. Treat it like a translator, not an oracle, and the system becomes predictable.</p>
+
+                <p>The second lesson: <strong>structured output is the difference between a demo and a product.</strong> The first version of this agent returned free text and I parsed it with regex. It worked 85% of the time. Switching to a strict JSON contract pushed it to 99%, because now the failure mode is "JSON parse error" &mdash; loud, logged, easy to debug &mdash; instead of "we silently dropped the WHERE clause."</p>
+
+                <p>The third lesson: <strong>schema-aware prompting generalizes.</strong> The exact same architecture &mdash; introspect the catalog, render foreign keys, force JSON, gate the output &mdash; runs against Postgres, against Databricks SQL with Unity Catalog, against Snowflake. The warehouse swap is a SQLAlchemy URL change. The agent's intelligence is in the prompt construction, not the database driver.</p>
+
+                <h2>Tech Stack</h2>
+
+                <p>Python 3.11. LangChain (<code>ChatOpenAI</code>, <code>HumanMessage</code>, <code>SystemMessage</code>) for the LLM client. OpenAI GPT-4 Turbo, temperature 0.1. SQLAlchemy with connection pooling (<code>pool_pre_ping</code>, <code>pool_recycle=300</code>). PostgreSQL 16 in the reference implementation; portable to Databricks SQL via Unity Catalog. Pydantic <code>BaseSettings</code> for typed config. <code>typer</code> + <code>rich</code> for the CLI (syntax-highlighted SQL, tabular results, panel layouts). <code>pandas</code> for result DataFrames. Optional FastAPI + Streamlit surfaces in the docs folder for HTTP and demo UI.</p>
+
+                <h2>Source</h2>
+
+                <p>The reference implementation runs against a real museum/gallery schema with attribution constraints &mdash; the database and sample data stay private. The architecture, prompt design, safety pattern, and component snippets above represent the production system end-to-end. Reach out via the portfolio contact page if you want a walk-through against your own warehouse.</p>
+
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; Anand Mahajan &middot; <a href="../index.html">Back to portfolio</a></p>
+        </div>
+    </footer>
+</body>
+</html>

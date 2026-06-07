@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Claude Infrastructure | AI Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/project-page.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">AI Portfolio</a>
+            <ul class="nav-menu">
+                <li><a href="../index.html#projects">All Projects</a></li>
+                <li><a href="../index.html#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="project-header">
+        <div class="container">
+            <a href="../index.html#projects" class="back-link">&larr; Back to Projects</a>
+            <h1 class="project-page-title">Custom Claude Infrastructure</h1>
+            <p class="project-page-tagline">A persistent memory system, a custom tooling layer, and an education layer built on top of Claude &mdash; so it remembers across sessions, integrates with my actual workflow, and scales with me instead of resetting every time.</p>
+            <div class="project-page-badges">
+                <span class="badge">Persistent Memory</span>
+                <span class="badge">Cross-Session Continuity</span>
+                <span class="badge">File-based, Markdown-driven</span>
+                <span class="badge">Multi-machine</span>
+                <span class="badge">tmux + Slash Commands</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="project-content">
+        <div class="container">
+            <div class="readme-content">
+
+                <p class="lead">Claude is good out of the box. It is not enough for the way I actually work. I run multiple consulting engagements, a personal trading book, several family-side projects, and an interview pipeline &mdash; all in parallel, all across four machines. Every chat starts at zero unless I do something about it. So I built three layers on top of Claude: a memory system that survives a reboot, a tooling layer that gives me one keystroke to spin up a coordinated team of agents in tmux, and an education layer that became my own first-principles textbook on the Anthropic API. Together they turn Claude from a clever text box into a piece of infrastructure I depend on daily.</p>
+
+                <h2>The Problem I Was Solving</h2>
+
+                <p>Out of the box, every LLM session is a goldfish. You teach it your codebase, your domain, the seven rules you don't want it to violate, the three projects in flight, the way you like your code formatted &mdash; and then you close the tab and it forgets all of it. The next morning you start over. Multiply that by the number of projects I touch in a week and the loss compounds: hours per day re-establishing context, plus the much larger cost of <em>decisions I made yesterday that today's session never learns about</em>.</p>
+
+                <p>I tried the obvious things first. Long system prompts &mdash; ballooned and rotted. One giant <code>CLAUDE.md</code> per project &mdash; better, but still dumb: it reloaded every time and couldn't represent "this is a hard rule I learned the hard way on April 22nd" differently from "this is a one-time project note." And it didn't help me bring up multiple Claude sessions side by side when I needed three coordinated agents (one watching the tape, one writing code, one summarizing) instead of one chat.</p>
+
+                <p>So I split the problem into three layers, each with a single responsibility, and built one folder for each. The result is the system below.</p>
+
+                <h2>System Architecture</h2>
+
+                <p>Three independent repositories, three responsibilities, all reachable from any Claude session running anywhere in my codebase. Memory is files on disk. Tooling is shell scripts and a slash command. Education is a runnable Python course I wrote to force myself to understand the API at the protocol level before relying on it.</p>
+
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│  Claude (any session, any machine, any project folder)          │
+│  reads CLAUDE.md → discovers the three layers below             │
+└─────────────────────────────────────────────────────────────────┘
+                            │
+        ┌───────────────────┼────────────────────┐
+        ▼                   ▼                    ▼
+┌──────────────────┐ ┌────────────────┐ ┌──────────────────────┐
+│  claude-memory   │ │  claude-tools  │ │   claude-tutorial    │
+│  (memory layer)  │ │ (tooling layer)│ │  (education layer)   │
+├──────────────────┤ ├────────────────┤ ├──────────────────────┤
+│ MEMORY.md (idx)  │ │ /tmuxpro skill │ │ 8 chapters, runnable │
+│ feedback_*.md    │ │ crew-launcher  │ │ quizzes + ASCII art  │
+│ rules_*.md       │ │ script-launcher│ │ system prompts       │
+│ strategy_*.md    │ │ identity files │ │ streaming, temp,     │
+│ project_*.md     │ │ tmux.conf      │ │ stop sequences       │
+│ frontmatter +    │ │ install.sh     │ │ helper functions     │
+│ type tagging     │ │ slash commands │ │ conversation mgmt    │
+└──────────────────┘ └────────────────┘ └──────────────────────┘
+        │                   │                    │
+        ▼                   ▼                    ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  Dropbox sync — same three folders visible on all 4 machines    │
+│  Same rules, same tools, same lessons, no per-machine drift     │
+└─────────────────────────────────────────────────────────────────┘</code></pre>
+
+                <p>The three folders are deliberately independent. Memory can be wiped without breaking the tools. Tools can be reinstalled without touching memory. The tutorial is read-only reference and never writes. This is the same trust-boundary discipline I use for production systems: one folder, one job, fail in isolation.</p>
+
+                <h2>Component 1 &mdash; claude-memory (the persistent brain)</h2>
+
+                <p>Memory is the most important of the three because everything else assumes it. The design is intentionally boring: a flat folder of markdown files, an index file that names them, and a frontmatter schema that lets Claude tell at a glance what kind of memory each file is.</p>
+
+                <p>The index, <code>MEMORY.md</code>, lives at the root. It is the first thing Claude reads at session start. The top section is labeled <em>READ FIRST</em> and points at the master strategy file, the hard-rules file, and the behavioral frame for the current project. The middle section is a chronological index of every persistent memory file with a one-line hook describing what it contains. New files get appended to the bottom; nothing is ever deleted.</p>
+
+<pre><code># MEMORY.md (excerpt — the index)
+
+## ★ READ FIRST at session start
+- memory/strategy_master.md      — the consolidated playbook
+- memory/rules_hard_constraints.md — DO/DON'T list, 30-sec scan
+- memory/user_roles_and_modes.md   — behavioral frame
+
+## Persistent Memory Files
+- memory/feedback_never_delete_data.md  — empirical data is the gold
+- memory/feedback_dont_overengineer.md  — most problems are one-line fixes
+- memory/feedback_discuss_dont_conclude.md — explore, don't ship by default
+- memory/feedback_plan_before_large_changes.md — plan file, approve, then ship
+- memory/project_YYYY-MM-DD_session.md   — end-of-day session log
+- ...</code></pre>
+
+                <p>Every memory file carries frontmatter so it self-describes. The schema is deliberately small: a <code>name</code>, a <code>description</code>, a <code>type</code> (one of <code>feedback</code>, <code>project</code>, <code>strategy</code>, <code>rules</code>, <code>user</code>, or <code>reference</code>), and a session ID that traces the file back to the conversation where the lesson was learned.</p>
+
+<pre><code>---
+name: Never delete or overwrite accumulated data — it's the gold
+description: Hard rule. Empirical data is the product itself. Append-only.
+type: feedback
+originSessionId: 22038f82-9417-46bd-84b4-e75c70004e7e
+---
+
+Empirical data we capture is the product itself — the gold being mined.
+Never design schemas, scripts, or features that wipe, truncate, or
+apply retention policies to this data.
+
+**Why:** The value compounds with accumulated history...
+**How to apply:** Default to INSERT ... ON CONFLICT DO UPDATE...
+**Related rule:** Global CLAUDE.md "NEVER DELETE FILES" extends to data.</code></pre>
+
+                <p>The <code>type</code> tag is doing real work. A <code>feedback</code> file represents a rule I taught Claude after it got something wrong &mdash; it should be loaded into every session and treated as a constraint. A <code>project</code> file is end-of-day state for a specific build &mdash; load only when that project is active. A <code>strategy</code> file is a playbook I want consulted before any related action. A <code>rules</code> file is a 30-second scannable DO/DON'T list. The same folder serves all of these because the type tag tells the reader how to weight each file.</p>
+
+                <p>End-of-day discipline is built in. After any meaningful work session, Claude appends a new <code>project_YYYY-MM-DD_session.md</code> file with frontmatter, a "ship list," any rules locked in that day, and a 3-5 line resume block for the next session. The next morning's Claude reads the most recent session file and inherits the full state in under two seconds. 365 of these in a year is fine. They are append-only build history.</p>
+
+                <p>The first principle behind all of this: <strong>memory is not state, it is documents.</strong> Documents don't need a database, don't need a server, don't need an API. They sync via Dropbox, they grep with <code>ripgrep</code>, they diff with <code>git</code>, and they outlive any vendor.</p>
+
+                <h2>Component 2 &mdash; claude-tools (the tooling layer)</h2>
+
+                <p>One Claude window is not enough when the work has multiple concurrent roles. While debugging a trading-system pipeline, I want one Claude watching the tape, one writing Python, one summarizing the day, and one acting as the discipline layer that refuses to let me trade against my own rules. Each one needs its own working directory, its own slash command, its own visual identity so I don't confuse them, and its own tmux window so I can flip between them with one keystroke.</p>
+
+                <p>That is what <code>claude-tools</code> does. It is a small repository of shell scripts and Claude slash commands that turn a tmux session into a coordinated multi-agent environment.</p>
+
+                <p>The flagship piece is the <code>/tmuxpro</code> skill. It is a Claude Code slash command that walks me through setting up a multi-window tmux environment for any project. It asks how many agent windows and script windows I need, assigns colors from a fixed palette, and generates the config files, the launcher script, and the per-project <code>/crew</code> command that spins everything up later in one shot.</p>
+
+<pre><code># crew.conf — agent definitions for one project
+# name | command   | label       | color    | bg_tint  | directory
+researcher|/research|Researcher  |#00bfff   |#0a1a2a   |agents/researcher
+coder     |/code   |Coder        |#00ff87   |#0a1f0a   |agents/coder
+reviewer  |/review |Reviewer     |#ffd700   |#1f1a0a   |agents/reviewer
+discipline|/enforce|Discipline   |#ff4500   |#1f0a00   |agents/discipline</code></pre>
+
+                <p>The <code>crew-launcher</code> script reads that file and opens one tmux window per agent, each with its color, background tint, working directory, welcome banner, and auto-submitted slash command. The cyan window is the researcher. The green window is the coder. The red window is the discipline layer that says "no" to me. I never have to remember which window is which &mdash; the color tells me, before I read a single line.</p>
+
+                <p>Alongside the agent launcher is a parallel <code>script-launcher</code> for non-Claude windows &mdash; the market-data monitor, the log tail, the cron watcher. Same config-file convention, different content, no Claude in those windows. The point is that the same visual+keyboard discipline applies whether the window holds an LLM or a <code>tail -f</code>.</p>
+
+                <p>The tmux config that ships with the installer is opinionated. The prefix is <code>Ctrl+A</code> instead of <code>Ctrl+B</code>. Splits are <code>|</code> horizontal and <code>-</code> vertical. Pane navigation is <code>Option+Arrow</code> with no prefix. F1 through F12 jump directly to windows 1-12 with no prefix. Mouse support is on, base index is 1, scrollback is 50,000 lines, and 256-color plus true-color are enabled. Every one of those choices came from a real friction point I hit running multi-agent setups.</p>
+
+                <p>There is also an <code>identity/</code> folder &mdash; three markdown files (<code>IDENTITY.md</code>, <code>SOUL.md</code>, <code>USER.md</code>) that any headless Claude invocation can be pointed at to establish who it is, what it is allowed to do, and who I am to it. This is what lets me run <code>claude -p "..."</code> non-interactively from a script and still have it behave like the same coherent agent across calls.</p>
+
+                <p>Installation is one command:</p>
+
+<pre><code>git clone &lt;repo&gt;/claude-tools.git ~/claude-tools
+bash ~/claude-tools/install.sh
+# &mdash; copies /tmuxpro skill to ~/.claude/commands/
+# &mdash; backs up any existing ~/.tmux.conf, installs the recommended one
+# &mdash; reloads tmux config if currently inside tmux</code></pre>
+
+                <p>After that, every project gets its own coordinated crew with one command. The slash-command pattern means I never have to remember the shell incantation &mdash; Claude itself drives the setup.</p>
+
+                <h2>Component 3 &mdash; claude-tutorial (the education layer)</h2>
+
+                <p>I am suspicious of tools I use heavily but understand only superficially. The Anthropic API is one of those tools. So I built a runnable, interactive tutorial &mdash; eight chapters, real API calls, quizzes after each chapter &mdash; as a way to force myself to learn it at the protocol level. The tutorial lives in <code>claude-tutorial/</code> and doubles as reference material when I am building something new.</p>
+
+                <p>The curriculum maps the Anthropic API at increasing depth:</p>
+
+                <ul>
+                    <li><strong>Chapter 1</strong> &mdash; First API request. Anatomy of the response object, role of <code>messages</code>, what <code>stop_reason</code> actually means.</li>
+                    <li><strong>Chapter 2</strong> &mdash; Multi-turn conversations. Managing history, alternating roles, the cost of dragging context.</li>
+                    <li><strong>Chapter 3</strong> &mdash; Helper functions. Wrapping the SDK so I never have to remember the verbose calling convention.</li>
+                    <li><strong>Chapter 4</strong> &mdash; A working chat application built from the helpers.</li>
+                    <li><strong>Chapter 5</strong> &mdash; System prompts. Constraint vs. personality vs. format scaffolding, and when each matters.</li>
+                    <li><strong>Chapter 6</strong> &mdash; Temperature. Empirical demonstrations of how 0.0, 0.5, and 1.0 change the same prompt's output distribution.</li>
+                    <li><strong>Chapter 7</strong> &mdash; Streaming. The event types, how to assemble a response incrementally, why streaming changes UX.</li>
+                    <li><strong>Chapter 8</strong> &mdash; Output control. Prefilled assistant turns and <code>stop_sequences</code> as the cheapest steering knobs available.</li>
+                </ul>
+
+                <p>The architecture mirrors how I learn: a thin <code>core/</code> module (client, conversation manager, image helper, quiz engine) sits underneath chapter files that import from it. Each chapter is a runnable Python module with live code examples and ASCII art for the diagrams. The <code>main.py</code> entry point sequences the chapters with quizzes between them; <code>anthropic_api_tutorial.py</code> is a single-file version for people who just want to read.</p>
+
+<pre><code># core/client.py — the wrapper every chapter imports
+
+class ClaudeClient:
+    """Thin wrapper around anthropic.Anthropic with sane defaults."""
+
+    def __init__(self, model="claude-sonnet-4-5", max_tokens=1024):
+        self.client = anthropic.Anthropic()  # picks up ANTHROPIC_API_KEY
+        self.model = model
+        self.max_tokens = max_tokens
+
+    def ask(self, prompt, system=None, temperature=1.0):
+        kwargs = dict(
+            model=self.model,
+            max_tokens=self.max_tokens,
+            temperature=temperature,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        if system:
+            kwargs["system"] = system
+        return self.client.messages.create(**kwargs).content[0].text</code></pre>
+
+                <p>Building it taught me three things I now use every day. First, the API's surface is small &mdash; most of the apparent complexity is in how you compose <code>messages</code>, not in the API itself. Second, <code>system</code> is a much sharper steering tool than a long user prompt; once I internalized that, my own production prompts shrank by half. Third, streaming and stop sequences are wildly under-used &mdash; they are the cheapest UX upgrades available and most people skip them because the docs frame them as advanced.</p>
+
+                <p>The tutorial is also the seedbed for the helpers that ended up in the tooling layer. The headless invocation pattern in <code>claude-tools/identity/</code> is a direct descendant of Chapter 5's system-prompt experiments.</p>
+
+                <h2>How the Three Layers Interact</h2>
+
+                <p>The three folders look independent but they reinforce each other in a way that I only noticed after living with them for a few months:</p>
+
+                <ol>
+                    <li><strong>Memory makes tools coherent.</strong> When the crew launcher spins up four Claude windows for a project, all four read the same <code>CLAUDE.md</code> and the same <code>memory/</code> folder. They start the morning with shared context. The "discipline layer" agent and the "coder" agent reference the same hard rules &mdash; there is no possibility of them disagreeing on policy.</li>
+                    <li><strong>Tooling makes memory portable.</strong> The tmux/skill installation pattern means every machine I own can recreate the same multi-agent environment in one command. Combined with Dropbox-synced memory, a fresh machine is productive in under five minutes.</li>
+                    <li><strong>Education makes both honest.</strong> When something in the memory or tools layer behaves surprisingly, the tutorial is where I go to reproduce it minimally and figure out whether the surprise is mine or the API's. Most of the time it's mine.</li>
+                </ol>
+
+                <h2>Why It Works &mdash; Design Decisions</h2>
+
+                <ol>
+                    <li><strong>Files, not state.</strong> Every persistent artifact is a flat file. No database, no server, no API to maintain. <code>grep</code>, <code>git</code>, and Dropbox are the entire infrastructure. The system survives any vendor outage.</li>
+                    <li><strong>Frontmatter as a type system.</strong> A two-line YAML header per memory file is enough metadata for Claude to weight feedback rules differently from project notes differently from strategy playbooks. Almost free, hugely useful.</li>
+                    <li><strong>Append-only memory.</strong> Nothing is ever deleted. End-of-day session files accumulate. The compounded history is more valuable than any "tidy" current state would be. I learned this from the trading data: a single day is noise, a year is a dataset.</li>
+                    <li><strong>One slash command per workflow.</strong> If I have to remember a shell incantation, I will forget it. If it is a Claude slash command (<code>/tmuxpro</code>, <code>/crew</code>), Claude itself reminds me. The cost of building the skill once is repaid every time I open a project.</li>
+                    <li><strong>Visual coding for parallel agents.</strong> Color is bandwidth. A red window and a cyan window communicate role faster than any title bar. The tmux color palette is the cheapest UX upgrade in the whole stack.</li>
+                    <li><strong>Education before reliance.</strong> Writing the tutorial before I built the tools meant the tools were built on actual understanding, not vibe coding. The 60 hours of writing chapters has paid for itself 10x in not-shipping-broken-prompts.</li>
+                </ol>
+
+                <h2>What I Learned</h2>
+
+                <p>The first principle that drove all of this: <strong>information doesn't need activation, it just needs to be available.</strong> Every "smart memory" startup wants to add a vector database and a recall layer. I tried it. None of it beat a flat folder of markdown files that Claude reads at session start. The cost of the markdown approach is near zero; the ceiling is whatever I can stuff into a CLAUDE.md plus what Claude can grep on demand. That is enough for everything I actually do.</p>
+
+                <p>The second lesson: <strong>tools should be slash commands, not shell aliases.</strong> The moment I moved my multi-agent setup from a shell script I had to remember to a <code>/tmuxpro</code> slash command Claude could discover, my actual usage of it went up 5x. Discoverability is a feature, and Claude itself is the best place to put it.</p>
+
+                <p>The third lesson, the hardest one: <strong>the system has to be boring before it becomes valuable.</strong> The first three versions of the memory layer had clever indexing, fuzzy matching, an embedding cache. None of it helped. The current version has a flat folder, an index file, and frontmatter tags. It is so simple that there is nothing to break. That is exactly why I trust it.</p>
+
+                <h2>Tech Stack</h2>
+
+                <p>Markdown for memory. YAML frontmatter for type tagging. Bash for installers and launchers. tmux 3.x with a custom <code>~/.tmux.conf</code>. Claude Code slash commands for discoverability. Python 3 for the tutorial (uses the official <code>anthropic</code> SDK). Dropbox for cross-machine sync. <code>ripgrep</code> for memory search. Git for version history. No databases. No servers. No build steps.</p>
+
+                <h2>Source</h2>
+
+                <p>The three folders contain personal memory, client context, and active project state and stay private. The patterns &mdash; frontmatter schema, memory index format, tmux config, slash-command structure, and tutorial curriculum &mdash; are reproduced faithfully in the snippets above. Reach out if you would like a deeper walk-through or want help adapting any of these layers to your own workflow.</p>
+
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; Anand Mahajan &middot; <a href="../index.html">Back to portfolio</a></p>
+        </div>
+    </footer>
+</body>
+</html>

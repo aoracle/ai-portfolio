@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Catalog | AI Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; margin: 0; background: #fafafa; color: #1a1a1a; }
+        nav { background: #1a1a1a; padding: 16px 32px; }
+        nav a { color: #fff; text-decoration: none; font-weight: 500; margin-right: 24px; }
+        nav a:hover { color: #aaa; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 40px 32px; }
+        h1 { font-family: 'Lora', serif; font-size: 2.5rem; margin-bottom: 8px; }
+        .subtitle { color: #666; font-size: 1rem; margin-bottom: 32px; font-style: italic; }
+        .filter-bar { background: #fff; padding: 18px 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 24px; }
+        .filter-label { font-size: 0.85rem; color: #666; margin-right: 12px; font-weight: 500; }
+        .filter-chip { display: inline-block; background: #eee; color: #333; padding: 6px 14px; border-radius: 16px; font-size: 0.85rem; margin: 4px 4px 4px 0; cursor: pointer; user-select: none; border: 1px solid transparent; transition: all 0.15s; }
+        .filter-chip:hover { background: #ddd; }
+        .filter-chip.active { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+        table { width: 100%; background: #fff; border-collapse: collapse; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border-radius: 8px; overflow: hidden; }
+        th { background: #1a1a1a; color: #fff; text-align: left; padding: 14px 16px; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        td { padding: 16px; border-top: 1px solid #eee; vertical-align: top; font-size: 0.9rem; }
+        tr:hover td { background: #fafafa; }
+        .cat-name a { color: #1a1a1a; font-weight: 600; text-decoration: none; }
+        .cat-name a:hover { color: #555; text-decoration: underline; }
+        .cat-category { color: #666; font-size: 0.85rem; white-space: nowrap; }
+        .cat-date { color: #888; font-size: 0.85rem; white-space: nowrap; }
+        .cat-status { display: inline-block; background: #e8f3ff; color: #0066cc; padding: 4px 10px; border-radius: 4px; font-size: 0.78rem; font-weight: 500; }
+        .cat-tech { display: inline-block; color: #444; font-size: 0.78rem; }
+        .cat-summary { color: #333; max-width: 420px; line-height: 1.5; }
+        .cat-takeaway { display: block; margin-top: 6px; color: #555; font-size: 0.85rem; font-style: italic; }
+        .stats { display: flex; gap: 32px; margin-bottom: 24px; }
+        .stat-card { background: #fff; padding: 16px 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .stat-num { font-size: 1.6rem; font-weight: 700; color: #1a1a1a; display: block; }
+        .stat-lab { font-size: 0.8rem; color: #666; text-transform: uppercase; letter-spacing: 0.5px; }
+        @media (max-width: 900px) { table { font-size: 0.8rem; } td, th { padding: 10px; } .cat-summary { max-width: 200px; } }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="index.html">← AI Portfolio</a>
+        <a href="index.html#projects">Projects</a>
+        <a href="index.html#tech">Tech Stack</a>
+        <a href="catalog.html">Catalog</a>
+    </nav>
+    <div class="container">
+        <h1>Project Catalog</h1>
+        <p class="subtitle">A dense, scannable reference of every project — for me, as much as for you.</p>
+
+        <div class="stats">
+            <div class="stat-card"><span class="stat-num">13</span><span class="stat-lab">Projects</span></div>
+            <div class="stat-card"><span class="stat-num">5</span><span class="stat-lab">Categories</span></div>
+            <div class="stat-card"><span class="stat-num">850K+</span><span class="stat-lab">Lines of Code</span></div>
+            <div class="stat-card"><span class="stat-num">2024 — 2026</span><span class="stat-lab">Date Range</span></div>
+        </div>
+
+        <div class="filter-bar">
+            <span class="filter-label">FILTER BY CATEGORY:</span>
+            <span class="filter-chip active" data-cat="all">All (13)</span>
+            <span class="filter-chip" data-cat="Enterprise Data &amp; AI">Enterprise Data &amp; AI (4)</span>
+            <span class="filter-chip" data-cat="Personal AI Infrastructure">Personal AI Infrastructure (4)</span>
+            <span class="filter-chip" data-cat="Browser &amp; Web Automation">Browser &amp; Web Automation (1)</span>
+            <span class="filter-chip" data-cat="Trading AI">Trading AI (1)</span>
+            <span class="filter-chip" data-cat="Media &amp; Content AI">Media &amp; Content AI (3)</span>
+        </div>
+
+        <table id="catalog">
+            <thead>
+                <tr>
+                    <th>Project</th>
+                    <th>Category</th>
+                    <th>Active</th>
+                    <th>Status</th>
+                    <th>Key Tech</th>
+                    <th>Summary &amp; Takeaway</th>
+                </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="cat-name"><a href="projects/bampfa.html">BAMPFA CMS</a></td>
+                <td class="cat-category">Enterprise Data & AI</td>
+                <td class="cat-date">Aug 2025 — May 2026</td>
+                <td class="cat-status">Phase 4 Live</td>
+                <td class="cat-tech-cell"><span class="cat-tech">PostgreSQL</span> · <span class="cat-tech">Python</span> · <span class="cat-tech">Flask</span> · <span class="cat-tech">Nginx</span> · <span class="cat-tech">Digital Ocean</span></td>
+                <td class="cat-summary">Database modernization unifying 3 legacy systems (FileMaker, CollectionSpace, Tessitura) for Berkeley Art Museum.<br><span class="cat-takeaway"><strong>Takeaway:</strong> Museum data is relational, not document — Drupal→Postgres migration via a 53-table schema.</span></td>
+            </tr>
+            <tr>
+                <td class="cat-name"><a href="projects/dbvalidator.html">DBValidator</a></td>
+                <td class="cat-category">Enterprise Data & AI</td>
+                <td class="cat-date">Oct 2025 — Feb 2026</td>
+                <td class="cat-status">Production</td>
+                <td class="cat-tech-cell"><span class="cat-tech">Python</span> · <span class="cat-tech">Oracle</span> · <span class="cat-tech">Databricks</span> · <span class="cat-tech">Snowflake</span> · <span class="cat-tech">PostgreSQL</span></td>
+                <td class="cat-summary">Multi-platform DB validation with 4 matching modes (Exact, Selective, DQ Rules, Adaptive).<br><span class="cat-takeaway"><strong>Takeaway:</strong> Migration confidence comes from MD5-hash row-level proofs, not sample checks.</span></td>
+            </tr>
+            <tr>
+                <td class="cat-name"><a href="projects/dbsql-agent.html">Databricks SQL Agent</a></td>
+                <td class="cat-category">Enterprise Data & AI</td>
+                <td class="cat-date">Sep 2025 — Feb 2026</td>
+                <td class="cat-status">Beta</td>
+                <td class="cat-tech-cell"><span class="cat-tech">Python</span> · <span class="cat-tech">Databricks SQL</span> · <span class="cat-tech">Unity Catalog</span> · <span class="cat-tech">MCP</span></td>
+                <td class="cat-summary">Natural-language SQL agent for Databricks workspaces via MCP.<br><span class="cat-takeaway"><strong>Takeaway:</strong> Schema metadata in the prompt prevents hallucinated SQL on enterprise warehouses.</span></td>
+            </tr>
+            <tr>
+                <td class="cat-name"><a href="projects/cars180.html">cars180.com</a></td>
+                <td class="cat-category">Enterprise Data & AI</td>
+                <td class="cat-date">Jun 2025 — Apr 2026</td>
+                <td class="cat-status">Live · 8,840+ listings</td>
+                <td class="cat-tech-cell"><span class="cat-tech">Python</span> · <span class="cat-tech">PostgreSQL</span> · <span class="cat-tech">FastAPI</span> · <span class="cat-tech">React</span> · <span class="cat-tech">OpenAI</span></td>
+                <td class="cat-summary">India used-car marketplace aggregating 7+ platforms with AI buyer agent.<br><span class="cat-takeaway"><strong>Takeaway:</strong> Multi-source scraping + unified schema beats any single source for breadth.</span></td>
+            </tr>
+            <tr>
+                <td class="cat-name"><a href="projects/gajadata.html">Gajadata Life-OS</a></td>
+                <td class="cat-category">Personal AI Infrastructure</td>
+                <td class="cat-date">Feb 2026 — Ongoing</td>
+                <td class="cat-status">Production</td>
+                <td class="cat-tech-cell"><span class="cat-tech">Nginx</span> · <span class="cat-tech">Bash</span> · <span class="cat-tech">PHP</span> · <span class="cat-tech">Claude CLI</span> · <span class="cat-tech">Tailscale</span> · <span class="cat-tech">PWA</span></td>
+                <td class="cat-summary">Personal life-OS — mobile voice notes routed by Claude into project folders, synced across 4 machines.<br><span class="cat-takeaway"><strong>Takeaway:</strong> Static HTML + cron + a markdown queue is enough infrastructure for a personal OS.</span></td>
+            </tr>
+            <tr>
+                <td class="cat-name"><a href="projects/voice-to-action.html">Voice-to-Action Pipeline</a></td>
+                <td class="cat-category">Personal AI Infrastructure</td>
+                <td class="cat-date">Jan 2026 — May 2026</td>
+                <td class="cat-status">Production</td>
+                <td class="cat-tech-cell"><span class="cat-tech">Plaud</span> · <span class="cat-tech">Google Drive</span> · <span class="cat-tech">Python</span> · <span class="cat-tech">Claude CLI</span> · <span class="cat-tech">Bash</span></td>
+                <td class="cat-summary">Voice recorder → AI transcription → Claude classification → project folder routing.<br><span class="cat-takeaway"><strong>Takeaway:</strong> Dual-path sync (Drive primary, REST backup) prevents single-vendor lock-in.</span></td>
+            </tr>
+            <tr>
+                <td class="cat-name"><a href="projects/claude-infra.html">Custom Claude Infrastructure</a></td>
+                <td class="cat-category">Personal AI Infrastructure</td>
+                <td class="cat-date">Mar 2026 — Apr 2026</td>
+                <td class="cat-status">Production</td>
+                <td class="cat-tech-cell"><span class="cat-tech">Markdown</span> · <span class="cat-tech">Bash</span> · <span class="cat-tech">Claude CLI</span></td>
+                <td class="cat-summary">Persistent file-based memory + custom CLI tools + tutorial templates.<br><span class="cat-takeaway"><strong>Takeaway:</strong> Markdown files with frontmatter make a portable, queryable memory layer.</span></td>
+            </tr>
+            <tr>
+                <td class="cat-name"><a href="projects/iceoderai.html">IceOder.ai</a></td>
+                <td class="cat-category">Personal AI Infrastructure</td>
+                <td class="cat-date">Jul 2025 — Feb 2026</td>
+                <td class="cat-status">Desktop App</td>
+                <td class="cat-tech-cell"><span class="cat-tech">Electron</span> · <span class="cat-tech">TypeScript</span> · <span class="cat-tech">React</span> · <span class="cat-tech">OpenAI</span> · <span class="cat-tech">Google APIs</span></td>
+                <td class="cat-summary">AI-powered productivity desktop suite — screenshot analysis, transcription, interview coaching.<br><span class="cat-takeaway"><strong>Takeaway:</strong> GPT-4 Vision + screenshot is the fastest path to an 'agent that sees your screen'.</span></td>
+            </tr>
+            <tr>
+                <td class="cat-name"><a href="projects/browser-automation.html">Browser Automation Toolkit</a></td>
+                <td class="cat-category">Browser & Web Automation</td>
+                <td class="cat-date">Jul 2025 — Feb 2026</td>
+                <td class="cat-status">Optimized Fork</td>
+                <td class="cat-tech-cell"><span class="cat-tech">Python</span> · <span class="cat-tech">Playwright</span> · <span class="cat-tech">TypeScript</span> · <span class="cat-tech">LLM-driven</span></td>
+                <td class="cat-summary">Optimized fork of browser-use + custom devtools for inspecting LLM-driven sessions.<br><span class="cat-takeaway"><strong>Takeaway:</strong> Token cost of browser automation drops sharply when you cache DOM state.</span></td>
+            </tr>
+            <tr>
+                <td class="cat-name"><a href="projects/spx.html">SPX Trading System</a></td>
+                <td class="cat-category">Trading AI</td>
+                <td class="cat-date">Jun 2025 — Feb 2026</td>
+                <td class="cat-status">90% Accuracy</td>
+                <td class="cat-tech-cell"><span class="cat-tech">Python</span> · <span class="cat-tech">ML</span> · <span class="cat-tech">ThetaData</span> · <span class="cat-tech">OpenAI</span> · <span class="cat-tech">Ollama</span></td>
+                <td class="cat-summary">Real-time S&P 500 prediction with triple-barrier ML labeling.<br><span class="cat-takeaway"><strong>Takeaway:</strong> Lookahead bias is the silent killer of trading models; triple-barrier solves it.</span></td>
+            </tr>
+            <tr>
+                <td class="cat-name"><a href="projects/voice-clone.html">Voice Clone System</a></td>
+                <td class="cat-category">Media & Content AI</td>
+                <td class="cat-date">Nov 2024 — Feb 2026</td>
+                <td class="cat-status">Complete</td>
+                <td class="cat-tech-cell"><span class="cat-tech">Python</span> · <span class="cat-tech">Audio Processing</span> · <span class="cat-tech">Speaker ID</span></td>
+                <td class="cat-summary">Concatenative voice synthesis from 1-min source audio (306 unique words extracted).<br><span class="cat-takeaway"><strong>Takeaway:</strong> You don't need a neural vocoder if you have enough source words.</span></td>
+            </tr>
+            <tr>
+                <td class="cat-name"><a href="projects/youtube.html">YouTube AI Suite</a></td>
+                <td class="cat-category">Media & Content AI</td>
+                <td class="cat-date">Jun 2025 — Feb 2026</td>
+                <td class="cat-status">Production</td>
+                <td class="cat-tech-cell"><span class="cat-tech">Python</span> · <span class="cat-tech">Flask</span> · <span class="cat-tech">GPT-4</span> · <span class="cat-tech">YouTube API</span></td>
+                <td class="cat-summary">YouTube transcript + summary + word cloud + sentiment analysis.<br><span class="cat-takeaway"><strong>Takeaway:</strong> $0.002/video is the right unit cost for content tools.</span></td>
+            </tr>
+            <tr>
+                <td class="cat-name"><a href="projects/small-ai-tools.html">Small AI Tools</a></td>
+                <td class="cat-category">Media & Content AI</td>
+                <td class="cat-date">Jan 2026 — Feb 2026</td>
+                <td class="cat-status">6 Utilities</td>
+                <td class="cat-tech-cell"><span class="cat-tech">Python</span> · <span class="cat-tech">GPT-4</span> · <span class="cat-tech">Claude</span> · <span class="cat-tech">Flask</span></td>
+                <td class="cat-summary">Six small AI utilities sharing one pattern (LLM + targeted I/O + minimal infra).<br><span class="cat-takeaway"><strong>Takeaway:</strong> Small focused tools that scratch one itch beat a single mega-tool.</span></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const chips = document.querySelectorAll('.filter-chip');
+        const rows = document.querySelectorAll('#catalog tbody tr');
+        chips.forEach(chip => {
+            chip.addEventListener('click', () => {
+                chips.forEach(c => c.classList.remove('active'));
+                chip.classList.add('active');
+                const cat = chip.dataset.cat;
+                rows.forEach(row => {
+                    const rowCat = row.querySelector('.cat-category').textContent.trim();
+                    row.style.display = (cat === 'all' || rowCat === cat.replace('&amp;', '&')) ? '' : 'none';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
