@@ -37,7 +37,7 @@
     <section class="project-content">
         <div class="container">
             <div class="readme-content">
-                <p class="lead">A comprehensive AI-powered productivity suite combining screenshot analysis, live transcription, and seamless integrations with your favorite tools. Your one-stop workspace for enhanced productivity and AI assistance.</p>
+                <p class="lead">A cross-platform desktop app that pulls five productivity surfaces &mdash; AI screenshot analysis, live transcription with interview coaching, Calendar, multi-tab browser, Notion-synced notes, and YouTube analysis &mdash; into one frame with a single 5-icon toolbar. Replaces context-switching across six SaaS tabs with one workspace.</p>
 
                 <h2>Philosophy</h2>
                 <ul>
@@ -152,6 +152,16 @@
                     <li><strong>Conversational AI</strong> - Follow-up questions on screenshot analysis</li>
                     <li><strong>Enhanced Transcription</strong> - Better accuracy and coaching features</li>
                 </ul>
+
+                <h2>What I Learned</h2>
+
+                <p>The headline lesson: <strong>cross-platform desktop means writing everything three times.</strong> Electron papers over the differences until the moment you touch the OS directly &mdash; global hotkeys, invisible windows, audio capture, screenshot grab &mdash; and then you're back to per-platform implementations with multiple fallback methods each. "Write once, run anywhere" is true for the UI and a lie for the system integration.</p>
+
+                <p>Second: <strong>the 5-icon toolbar was the constraint that made the app coherent.</strong> Six integrations would have been one too many. Five toolbar slots force a decision every time: does this new idea earn a slot? Most ideas don't. The constraint shipped a cleaner product than the "everything app" version would have.</p>
+
+                <p>Third: <strong>"invisible during screen share" is a real product requirement.</strong> Lots of AI assistant windows would happily leak your screen during a Zoom call. Making the window invisible-by-default wasn't a hypothetical &mdash; it came from a real moment where an analysis window popped up mid-presentation. Constraints born from real incidents are the ones that stick.</p>
+
+                <p>Fourth: <strong>composed integrations beat the all-in-one SaaS.</strong> Calendar + Browser + Notion + YouTube + Logs in one frame is a workflow I can't get from any single SaaS, and none of them goes deep enough on its own to be irreplaceable. The suite earns its keep by removing context switches, not by being best-in-class on any single axis. The value is the frame, not the parts.</p>
 
                 <h2>Tech Stack</h2>
                 <div class="tech-badges">

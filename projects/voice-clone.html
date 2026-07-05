@@ -113,6 +113,18 @@ python3 srk_voice_clone.py</code></pre>
                     <li><strong>Natural spacing</strong> between words</li>
                 </ul>
 
+                <h2>What I Learned</h2>
+
+                <p>The headline lesson: <strong>concatenative synthesis trades flexibility for zero hallucination, and for a clone that's the right trade.</strong> Neural TTS can say anything but doesn't sound like SRK; this library sounds exactly like SRK but only says words he's actually said. The constraint was deliberate &mdash; for voice cloning, fidelity to the source beats generality. A clone that hallucinates a phrase SRK never said is a broken clone.</p>
+
+                <p>Second: <strong>speaker identification is the whole game.</strong> 306 words of pure SRK is usable; 306 words contaminated with one interviewer phrase is broken. The pipeline spends more compute filtering SRK from non-SRK (analyzing transcripts, isolating segments, verifying each word) than on the synthesis itself. The filtering <em>is</em> the product.</p>
+
+                <p>Third: <strong>multiple pronunciations per word is a feature, not a bug.</strong> 672 versions of 306 words means the library captures SRK saying "I" in a statement, in a question, and trailing off in a laugh. Picking the right version for context is what makes a sentence sound natural instead of stitched. A single canonical pronunciation per word would have been a robot voice, not a clone.</p>
+
+                <p>Fourth: <strong>audio hygiene is non-negotiable and entirely unglamorous.</strong> 48kHz sample rate, fade in/out to prevent clicks at word boundaries, accurate word boundary detection, natural inter-word spacing. None of this is interesting; all of it is the difference between a sentence that lands and one that sounds chopped. The 80/20 of audio quality lives in the edge cases between words, not in the words themselves.</p>
+
+                <p>Fifth: <strong>the vocabulary is the ceiling, and I chose that ceiling on purpose.</strong> Every new sentence has to be expressible in words SRK has already said. That's the cost of purity &mdash; the library size (306 words) is the hard limit on what can be said, and growing it requires finding clean new source audio, not just calling a model API. Honest about the trade: I picked fidelity over extensibility.</p>
+
                 <h2>Tech Stack</h2>
                 <div class="tech-badges">
                     <span class="tech-badge">Python</span>

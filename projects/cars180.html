@@ -37,7 +37,7 @@
     <section class="project-content">
         <div class="container">
             <div class="readme-content">
-                <p class="lead"><strong>Your Personal Car-Finding Agent</strong> - Find your best deal, effortlessly.</p>
+                <p class="lead"><strong>Every used car in India, one place.</strong> Aggregates 8,840+ live listings across 7 platforms (Cars24, OLX, Spinny, CarDekho, CarWale + dealer network) into a single searchable surface &mdash; capturing the ~70-80% of inventory that never lists online.</p>
 
                 <h2>Project Overview</h2>
                 <p><strong>Cars180's mission: Show EVERY used car available in India in one place.</strong></p>
@@ -125,6 +125,18 @@
                     <li><strong>vehicles:</strong> 140 columns</li>
                     <li><strong>dealers:</strong> ~25 columns</li>
                 </ul>
+
+                <h2>What I Learned</h2>
+
+                <p>The headline lesson: <strong>the aggregation layer is the product.</strong> A unified 140-column vehicle schema stitched together from five different scrapers and a dealer-upload pipeline is 80% of the work; the comparison UI is the easy 20%. Each source has its own schema, its own update cadence, its own quirks. Normalizing all of that into one queryable table is the actual engineering, and anyone who thinks "aggregator" means "a few scrapers" hasn't shipped one.</p>
+
+                <p>Second: <strong>the offline inventory is the moat.</strong> Online platforms only cover ~20-30% of the market. The 70-80% sitting with local dealers who never list online is what an aggregator has to capture to be useful &mdash; without the dealer network, you're just a thinner version of Cars24. That insight shaped the entire roadmap: dealer portal first, comparison UI second.</p>
+
+                <p>Third: <strong>per-portal API separation pays off the first time you rotate credentials.</strong> Separate API files per portal (comparison, dealer, admin, dealer-admin) with their own auth sounded like over-engineering until the first time I needed to change auth on the dealer portal without touching the public site. Two hours of work instead of a risky cross-cutting change on a live site.</p>
+
+                <p>Fourth: <strong>Pune-first was the right call.</strong> 3,500 dealers in one city is a tractable data problem; nationwide on day one would have been a thin incomplete product. Capture one city properly, prove the unit economics, then expand. The temptation to launch everywhere at once is a vanity move that produces a worse product in every city.</p>
+
+                <p>Fifth, and the one I'd repeat on any marketplace: <strong>"no paid placements" is a design decision, not a feature.</strong> Aggregator trust dies the moment listings stop being unbiased. Building that constraint in from day one is cheap; retrofitting it after you've taken placement money is impossible.</p>
 
                 <h2>Tech Stack</h2>
                 <div class="tech-badges">

@@ -149,6 +149,18 @@ trading:
   max_position_size: 10000
   risk_per_trade: 0.02</code></pre>
 
+                <h2>What I Learned</h2>
+
+                <p>The headline lesson, and the one I'd shout at anyone building an ML trading system: <strong>lookahead bias is the silent killer, and triple barrier labeling is the discipline that keeps it honest.</strong> It isn't a fancy technique &mdash; it's the rule that says the model can't train on information it wouldn't have had at decision time. Without it, every backtest is a lie, and the lie is invisible until you trade live. This page documents it as a feature; it's really a guardrail.</p>
+
+                <p>Second: <strong>accuracy without frequency is misleading.</strong> The 90% headline accuracy sounds exceptional, and it is &mdash; but signals fire infrequently; most of the time the system correctly says "no signal." The headline number hides that distribution. Position-sizing and trade frequency have to respect it, or headline accuracy becomes a recipe for overtrading.</p>
+
+                <p>Third: <strong>multiple specialized models beat one monolithic model.</strong> A Live Predictor for entry timing, a Level Model for strategic positioning, and an AI Analyzer for multi-timeframe market understanding &mdash; different jobs, different accuracy profiles, different time horizons. Forcing them into one model would average each of them down to mediocrity on every axis. The modularity is the value.</p>
+
+                <p>Fourth: <strong>real-time prediction is a data pipeline problem, not a model problem.</strong> &lt; 1 second end-to-end on a ThetaTerminal feed during market hours is mostly about not introducing latency in the plumbing &mdash; the model inference itself is fast. The work lives in the data movement, the polling cadence, the caching, and the failover between data sources. The model is the part that's already fast enough.</p>
+
+                <p>Fifth, and the one I'd flag honestly: <strong>the confidence threshold is a risk-preference knob, not a tuned hyperparameter.</strong> Lower it and you get more signals at lower quality; raise it and you get fewer, higher-quality ones. There is no "correct" answer independent of the trader's risk tolerance. Documenting it as a deliberate choice is more honest than calling it optimized &mdash; it's a lever the user owns, not a number the system converges on.</p>
+
                 <h2>Tech Stack</h2>
                 <div class="tech-badges">
                     <span class="tech-badge">Python</span>

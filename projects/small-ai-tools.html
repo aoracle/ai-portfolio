@@ -227,6 +227,18 @@ def summarize_on_click(video_id):
 
                 <p>The most common failure mode I see in personal AI builds is overshooting the brief. Someone needs a YouTube summarizer and ends up architecting a multi-agent transcript pipeline with a vector DB and a React frontend. Each of these six tools is a deliberate refusal to do that. The constraint that made them work is the same constraint: <em>one problem, one script, one prompt, ship it.</em></p>
 
+                <h2>What I Learned</h2>
+
+                <p>The headline lesson, and the one I'd repeat on any personal AI build: <strong>one problem, one script, one prompt is a discipline, not a limitation.</strong> The most common failure mode I see in personal AI builds is overshooting the brief &mdash; someone needs a YouTube summarizer and ends up architecting a multi-agent transcript pipeline with a vector DB and a React frontend. Each of these six tools is a deliberate refusal to do that. The constraint is what made them ship, and ship is what made them get used.</p>
+
+                <p>Second: <strong>model choice IS cost engineering.</strong> GPT-4o-mini for summaries, GPT-3.5-turbo for digests, GPT-4 Vision only when pixels matter. The cheaper model is the right model more often than not, and the ~5% quality delta from the biggest model almost never justifies the ~20x cost multiplier. Defaulting to GPT-4 for everything is a tell that nobody priced the workflow.</p>
+
+                <p>Third: <strong>OAuth against an existing subscription beats metered API keys for high-frequency personal tools.</strong> Moltbot running against Claude Pro via OAuth flips the unit economics from "watch the meter" to "flat-rate, run it freely." For a tool I hit dozens of times a day, that's the difference between using it and not. The same shape applies to any assistant a single user reaches for constantly.</p>
+
+                <p>Fourth: <strong>Vision OCR ages slower than DOM scraping.</strong> WhatsApp's web client is heavily obfuscated and mutates aggressively across releases; a screenshot-plus-GPT-4-Vision pipeline ports across their UI refreshes for free. The brittleness doesn't disappear, it moves to a place I can tolerate &mdash; and a place that breaks loudly instead of silently.</p>
+
+                <p>Fifth: <strong>Markdown as the inter-tool protocol, on purpose.</strong> When tools need to talk, they write Markdown into a project folder; the next cron picks it up. No queues, no schemas, no message brokers, no API contracts. The whole stack runs on one Mac with cron and launchd, and when something breaks the bug is in one of about three places. The boring protocol is the reliable one.</p>
+
                 <h2>Tech Stack</h2>
 
                 <p><strong>Languages:</strong> Python 3 (five of six), TypeScript / Node (Moltbot). <strong>Web framework:</strong> Flask (TubeBrain, YouTube News Feed). <strong>LLMs:</strong> OpenAI GPT-4o-mini, GPT-3.5-turbo, GPT-4 Vision; Anthropic Claude via OAuth (Moltbot). <strong>YouTube ingestion:</strong> <code>youtube-transcript-api</code> for transcripts, channel RSS for discovery. <strong>Browser automation:</strong> Playwright (WhatsApp Summarizer). <strong>PDF:</strong> PyPDF2 + AcroForm + overlay fallback. <strong>Auth:</strong> Google OAuth (YouTube News Feed); Anthropic / OpenAI OAuth (Moltbot). <strong>Persistence:</strong> local JSON / pickle caches, Markdown digests routed into a shared notes folder. <strong>Deployment:</strong> all six run on a single Mac with cron and launchd; nothing requires a cloud account.</p>

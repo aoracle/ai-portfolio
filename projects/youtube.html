@@ -37,7 +37,7 @@
     <section class="project-content">
         <div class="container">
             <div class="readme-content">
-                <p class="lead">YuBrain is a powerful YouTube transcript analyzer that extracts transcripts from YouTube videos and provides AI-powered summaries and visual word clouds.</p>
+                <p class="lead">A Flask app that takes any YouTube URL, pulls the transcript via <code>youtube-transcript-api</code> (no API key, no quota, no approval queue), and returns a structured GPT-4o-mini summary plus a word cloud in under ten seconds. Built to decide in 30 seconds whether a 60-minute podcast is worth the hour.</p>
 
                 <h2>Features</h2>
                 <ul>
@@ -85,6 +85,16 @@ pip install -r requirements.txt
 python app.py
 
 # Open browser to http://localhost:8080</code></pre>
+
+                <h2>What I Learned</h2>
+
+                <p>The headline lesson, and the one that generalized most: <strong>the YouTube Data API isn't the only path.</strong> <code>youtube-transcript-api</code> pulls transcripts without an API key, without quota, without approval queues. For a transcript-summarizer, that's the difference between shipping in an afternoon and shipping in a sprint. The official API has its place; defaulting to it without checking for an open path is a tax on every personal build.</p>
+
+                <p>Second: <strong>GPT-4o-mini is the right model for transcript summaries, and saying so out loud is the discipline.</strong> A 30-minute video transcript through GPT-4 vs GPT-4o-mini is roughly 5% more nuance at ~20x the cost. For the question this tool actually answers &mdash; "is this video worth watching?" &mdash; the cheaper model is the right tool. Defaulting to the biggest available model is a tell that nobody priced the workflow.</p>
+
+                <p>Third: <strong>the word cloud is a pre-filter, not decoration.</strong> A word cloud of a 30-minute video tells you in two seconds whether the title was misleading. It's the cheapest signal in the pipeline and often the most useful one &mdash; I'd notice a misleading title from the word cloud faster than from a 300-word summary.</p>
+
+                <p>Fourth, and the one I'm being honest about: <strong>this is a single-purpose Flask app, and the discipline was resisting scope creep.</strong> URL in, summary out. The temptation to add playlists, PDF export, Notion sync, sentiment analysis is real (they're listed below as "Future Enhancements" precisely because they're <em>not</em> done &mdash; that framing is the honest version of a feature list). The tool gets used because it does one thing in under ten seconds.</p>
 
                 <h2>Tech Stack</h2>
                 <ul>
