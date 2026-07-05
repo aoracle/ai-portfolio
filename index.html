@@ -85,6 +85,11 @@
                     <h3>AI Native</h3>
                     <p>GPT-4 Vision, RAG pipelines, multi-agent systems, LLM orchestration - building the future of AI.</p>
                 </div>
+                <div class="philosophy-card">
+                    <div class="philosophy-icon">🖥️</div>
+                    <h3>Own the Stack</h3>
+                    <p>Cloud when it fits, on-prem when it matters &mdash; I run a 2&times; NVIDIA DGX Spark cluster for local LLM inference. The models, the data, and the latency stay on my own hardware.</p>
+                </div>
             </div>
         </div>
     </section>
@@ -117,6 +122,7 @@
                     <span class="filter-chip" data-filter="playwright">Playwright</span>
                     <span class="filter-chip" data-filter="python">Python</span>
                     <span class="filter-chip" data-filter="mcp">MCP</span>
+                    <span class="filter-chip" data-filter="local-llm">Local LLM</span>
                 </div>
                 <a href="catalog.html" style="display: inline-block; margin-top: 14px; font-size: 0.9rem; color: #1a1a1a; font-weight: 600; text-decoration: none; border-bottom: 1px solid #1a1a1a;">→ Full catalog table</a>
             </div>
@@ -820,6 +826,7 @@
                 'voice-clone': ['media', 'python'],
                 'youtube': ['media', 'gpt-4', 'python'],
                 'small-ai-tools': ['media', 'gpt-4', 'claude', 'python'],
+                'dgx-spark': ['personal', 'local-llm'],
             };
             const chips = document.querySelectorAll('.filter-chip');
             const projectCards = document.querySelectorAll('.project-card, .project-card-showcase');
