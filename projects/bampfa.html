@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BAMPFA CMS | AI Portfolio</title>
+    <title>BAMPFA &mdash; Custom CMS for UC Berkeley's Art Museum | AI Portfolio</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@500;600;700&display=swap" rel="stylesheet">
@@ -24,13 +24,14 @@
     <section class="project-header">
         <div class="container">
             <a href="../index.html#projects" class="back-link">&larr; Back to Projects</a>
-            <h1 class="project-page-title">BAMPFA CMS</h1>
-            <p class="project-page-tagline">Database Modernization for Berkeley Art Museum</p>
+            <h1 class="project-page-title">BAMPFA &mdash; Custom CMS for UC Berkeley's Art Museum</h1>
+            <p class="project-page-tagline">A 12-month engagement replacing a working museum's FileMaker + Drupal 7 tangle with a single Flask + PostgreSQL content system &mdash; live in production today, modeling 15 entity relationships and the full film-booking workflow that runs the institution's programming.</p>
             <div class="project-page-badges">
-                <span class="badge">Live</span>
-                <span class="badge">53 Tables</span>
+                <span class="badge">Live in Production</span>
+                <span class="badge">71 Tables &middot; 15 Entity Relations</span>
                 <span class="badge">PostgreSQL 16</span>
-                <span class="badge">Flask CMS</span>
+                <span class="badge">Flask + Gunicorn</span>
+                <span class="badge">Iterative CMS Build</span>
             </div>
         </div>
     </section>
@@ -38,127 +39,104 @@
     <section class="project-content">
         <div class="container">
             <div class="readme-content">
-                <p class="lead"><strong>Berkeley Art Museum and Pacific Film Archive</strong> - Comprehensive database architecture and CMS modernization replacing outdated Drupal 7 system.</p>
 
-                <h2>Project Overview</h2>
-                <p><strong>Mission:</strong> Modernize BAMPFA's website and database infrastructure, eliminating manual workflows and integrating disconnected databases (FileMaker, CollectionSpace/CineFiles, Tessitura) into a unified, scalable system.</p>
+                <p class="lead">BAMPFA &mdash; the Berkeley Art Museum and Pacific Film Archive &mdash; is a working museum and film archive whose programming data lived for years in disconnected FileMaker databases and a Drupal 7 website that didn't talk to each other. I was brought in as the data architect to replace that with one system. Twelve months later it is a custom Flask + PostgreSQL CMS running live on a Digital Ocean VPS: the FileMaker replacement, 71 tables modeling 15 entity relationships, and the full booking/payment workflow the film team now operates against. The codebase has been delivered to the client's own repository, and the film team begins testing with real data in mid-2026. This is that system &mdash; how it's built, what changed mid-build, and what I learned doing it.</p>
 
-                <h3>Current Status: ✅ Phase 4 Complete</h3>
-                <ul>
-                    <li><strong>Database:</strong> PostgreSQL 16 with 53-table optimized schema</li>
-                    <li><strong>Production:</strong> Live at http://134.199.187.48/</li>
-                    <li><strong>Environment:</strong> Digital Ocean (Ubuntu 24.04, 4GB RAM, SFO3)</li>
-                    <li><strong>Schema:</strong> No-migration deployment strategy implemented</li>
-                    <li><strong>Budget:</strong> ~70/100 hours delivered</li>
-                </ul>
+                <h2>The Problem I Was Solving</h2>
 
-                <h2>Key Features Implemented</h2>
-                <ul>
-                    <li>✅ <strong>User Management:</strong> Role-based permissions, Berkeley email integration</li>
-                    <li>✅ <strong>Content Workflows:</strong> Draft → Review → Approved → Published → Archived</li>
-                    <li>✅ <strong>Audit Trails:</strong> Complete change tracking for compliance</li>
-                    <li>✅ <strong>Media Management:</strong> Centralized file handling with metadata</li>
-                    <li>✅ <strong>API-Ready:</strong> RESTful endpoints for CMS integration</li>
-                    <li>✅ <strong>Performance:</strong> Indexed queries, optimized for large datasets</li>
-                    <li>✅ <strong>Alias Support:</strong> Film and person name variations without duplicates</li>
-                </ul>
+                <p>Three systems, none of them talking. FileMaker held the internal booking logistics &mdash; which films are booked, what's owed to distributors, shipping, condition reports. Drupal 7 held the public website. CollectionSpace/CineFiles held the film-archive metadata, and Tessitura handled ticketing. Staff duplicated data across systems by hand, reporting was a spreadsheet exercise, and none of it was auditable. The museum needed one source of truth.</p>
 
-                <h2>Database Architecture</h2>
-                <p>Hub-and-spoke schema with entity relationships:</p>
-                <pre><code>Exhibition/Film Series (1) → (Many) Events/Screenings
-                     ↓
-Events/Screenings (Many) ← → (Many) Art/Film Objects
-                     ↓
-Person Entities (Many) ← → (Many) All Content Types (with roles)</code></pre>
+                <p>The harder problem was that <em>no one could fully spec it on paper.</em> A museum's data model is deeply interconnected: a single screening event touches a film (with title variations, credits, countries, languages), a series, a venue, guest persons (with bios and roles), and a booking record (with payments, shipping, condition reports). Until the team could click through real forms, no one knew that countries needed to be multiselect tags instead of a dropdown, or that payment blocks needed to be tied to specific screening dates. CMS requirements emerge when real users touch real software &mdash; I planned the project around that fact from day one, in feedback rounds, instead of pretending the spec could be frozen upfront.</p>
 
-                <h3>Data Model Diagram</h3>
-                <img src="../images/projects/bampfa-erd.png" alt="BAMPFA Database ERD" style="width: 100%; border-radius: 8px; margin: 20px 0; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                <h2>System Architecture</h2>
 
-                <h2>UI Screenshots</h2>
-                <h3>Dashboard</h3>
-                <img src="../images/projects/bampfa-preview.png" alt="BAMPFA Dashboard" style="width: 100%; border-radius: 8px; margin: 20px 0; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                <p>A Flask web application served by Gunicorn behind Nginx, on a single Digital Ocean VPS running Ubuntu 24.04. PostgreSQL 16 holds everything in one normalized schema. The shape is deliberately hub-and-spoke: core entities &mdash; films, events, series, bookings, persons, venues &mdash; connect through junction tables that carry the relationship semantics (role, billing order, primary flag, display order). The junction layer is where the actual work lives; the entity tables are almost the boring part.</p>
 
-                <h3>Films Management</h3>
-                <img src="../images/projects/bampfa-films.png" alt="BAMPFA Films List" style="width: 100%; border-radius: 8px; margin: 20px 0; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                <img src="../images/projects/bampfa-erd.png" alt="BAMPFA database entity-relationship diagram (hub-and-spoke)" style="width: 100%; border-radius: 8px; margin: 20px 0; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
 
-                <h3>Events Management</h3>
-                <img src="../images/projects/bampfa-events.png" alt="BAMPFA Events List" style="width: 100%; border-radius: 8px; margin: 20px 0; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                <p>The numbers, as of the last accounting: 71 tables, 32+ database views exposing them to the UI, 61 performance indexes, 121 API routes, roughly 2,700 lines of Python. Six entity forms, each with full create / edit / search. The booking module is the heart of the system and the part that actually replaces FileMaker &mdash; a booking has a type (exhibition vs. permission), linked pairs (bidirectional), distributor contact notes with snapshots preserved at booking time, condition reports, shipping records, and multiple payment blocks each tied to specific screening dates.</p>
 
-                <h2>Current Database Contents</h2>
+                <h2>The Hard Part &mdash; Entity Linking</h2>
+
+                <p>The single largest engineering effort on the project was making every entity connect to every other entity. This is what turns the CMS from a data store into something useful for daily work. Fifteen junction relationships: Series&harr;Events, Events&harr;Films (with drag-drop screening order), Events&harr;Persons (roles, bios), Films&harr;Credits (director, actor &mdash; drag-drop ordering), Films&harr;Title Variations, Films&harr;Countries/Languages (multiselect tags), Films&harr;Related Films, Persons&harr;Name Variations, Persons&harr;Bios, Bookings&harr;Screenings, Bookings&harr;Payments, Bookings&harr;Linked Bookings, and the rest. Each one required database tables and views, GET/POST/PUT/DELETE endpoints, JavaScript for the UI, and integration into the form templates &mdash; 60+ endpoints just for linking. Autocomplete search walks the alias tables, so "Tarkovsky" finds "Andrei Tarkovskiy" and the original Russian spelling. Search is the daily workflow; it has to be forgiving.</p>
+
+                <img src="../images/projects/bampfa-preview.png" alt="BAMPFA CMS dashboard" style="width: 100%; border-radius: 8px; margin: 20px 0; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+
+                <h2>The Payment Redesign (where the structure changed mid-build)</h2>
+
+                <p>Six months in, the museum's testing lead flagged that payment data was scattered across three flat cards and Accounts Payable rows hung off the booking with no structure. This became structural priority #1. The redesign collapsed it into one Payment Information area: overall terms at the top, then multiple payment blocks each tied to a screening, with AP rows &mdash; date, amount, currency, invoice, note &mdash; nested inside each block with inline add / edit / delete. A migration added a nullable foreign key with <code>ON DELETE CASCADE</code>, so deleting a block cleans up its AP rows automatically. Shipped, tested, deployed to production.</p>
+
+                <p>This is the canonical example of the thing I planned for: a change you cannot spec on paper, because it only surfaces when a tester uses the real form and feels the friction. It is also the kind of change that, done right, makes the system permanently more honest &mdash; payment data now models how the museum actually thinks about money, not how FileMaker happened to store it.</p>
+
+                <h2>The Build Cycle (honest version)</h2>
+
+                <p>CMS work is iterative and I treated that as the method, not as scope creep. Round one: after the initial build, the testing lead produced a 66-item feedback document &mdash; 22 quick fixes, 12 medium features, 8 complex features (inline "Create New" modal, a Manage Lookups admin page, payment blocks, linked bookings). All 62 actionable items shipped; the rest were deferred on real decisions, not on effort. Round two: another testing pass, another set of fixes. Round three (mid-2026): the payment redesign above, plus three sent-back items &mdash; condition-report edit/delete failing in Safari, collapsible sections that would open but not close, distributor contact notes stuck on "Loading." All fixed and deployed. The codebase was delivered clean to the client's own Berkeley repository (no internal files, no secrets, single signed commit), and the film team is queued up to test with real data.</p>
+
                 <div class="mode-table">
                     <table>
                         <thead>
-                            <tr><th>Content Type</th><th>Count</th><th>Description</th></tr>
+                            <tr><th>What's in production</th><th>Count</th></tr>
                         </thead>
                         <tbody>
-                            <tr><td><strong>Films</strong></td><td>6</td><td>Film screenings with full metadata</td></tr>
-                            <tr><td><strong>Events</strong></td><td>8</td><td>Workshops, tours, performances, community events</td></tr>
-                            <tr><td><strong>Series</strong></td><td>3</td><td>Film series and exhibitions</td></tr>
-                            <tr><td><strong>Persons</strong></td><td>10</td><td>Curators, artists, directors, performers</td></tr>
-                            <tr><td><strong>Bookings</strong></td><td>2</td><td>Venue reservations</td></tr>
-                            <tr><td><strong>Tables</strong></td><td>53</td><td>Optimized schema (31 ERD + 22 operational)</td></tr>
+                            <tr><td>Database tables</td><td>71</td></tr>
+                            <tr><td>Database views (UI access layer)</td><td>32+</td></tr>
+                            <tr><td>Performance indexes</td><td>61</td></tr>
+                            <tr><td>API routes</td><td>121</td></tr>
+                            <tr><td>Entity forms (full CRUD + search)</td><td>6</td></tr>
+                            <tr><td>Junction relationships (entity linking)</td><td>15</td></tr>
+                            <tr><td>Stakeholder feedback items addressed</td><td>62 of 66 (rest deferred on decisions)</td></tr>
+                            <tr><td>Rounds of testing feedback incorporated</td><td>3</td></tr>
                         </tbody>
                     </table>
                 </div>
 
-                <h2>Technical Architecture</h2>
-                <h3>Stack</h3>
-                <ul>
-                    <li><strong>Backend:</strong> Flask (Python) with Gunicorn</li>
-                    <li><strong>Database:</strong> PostgreSQL 16</li>
-                    <li><strong>Server:</strong> Nginx (reverse proxy)</li>
-                    <li><strong>Hosting:</strong> Digital Ocean (SFO3)</li>
-                    <li><strong>Deployment:</strong> Daily backups enabled</li>
-                </ul>
+                <img src="../images/projects/bampfa-films.png" alt="BAMPFA CMS — films management view" style="width: 100%; border-radius: 8px; margin: 20px 0; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
 
-                <h3>Integration Points</h3>
-                <ul>
-                    <li><strong>FileMaker:</strong> Legacy art collection database</li>
-                    <li><strong>CollectionSpace:</strong> CineFiles film archive</li>
-                    <li><strong>Tessitura:</strong> Ticketing and events system</li>
-                </ul>
+                <img src="../images/projects/bampfa-events.png" alt="BAMPFA CMS — events management view" style="width: 100%; border-radius: 8px; margin: 20px 0; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
 
-                <h2>Project Phases</h2>
-                <div class="mode-table">
-                    <table>
-                        <thead>
-                            <tr><th>Phase</th><th>Status</th><th>Description</th></tr>
-                        </thead>
-                        <tbody>
-                            <tr><td><strong>Phase 1</strong></td><td>✅ Complete</td><td>Database schema design and implementation</td></tr>
-                            <tr><td><strong>Phase 2</strong></td><td>✅ Complete</td><td>Base zero deployment (local + EC2)</td></tr>
-                            <tr><td><strong>Phase 3</strong></td><td>✅ Complete</td><td>CMS integration and UI development</td></tr>
-                            <tr><td><strong>Phase 4</strong></td><td>✅ Complete</td><td>Production deployment to Digital Ocean</td></tr>
-                        </tbody>
-                    </table>
-                </div>
+                <h2>Why It Works &mdash; Design Decisions</h2>
+
+                <ol>
+                    <li><strong>One schema, no migrations.</strong> The deployment strategy versions schemas by timestamp and deploys clean DDL instead of mutating state in place. There is no migration drift, and "what state is prod in?" is a question that never comes up &mdash; the schema name is the answer.</li>
+                    <li><strong>Entity linking as a first-class concern.</strong> Fifteen junction tables, each carrying real semantics (role, order, primary flag). The CMS is not a CRUD app; it is a relationship graph the UI exposes. That is the whole reason it can replace FileMaker.</li>
+                    <li><strong>Booking snapshots preserve history.</strong> Distributor contact info is copied onto the booking at creation time. Years from now, when the distributor's address changes, the old booking still shows what was true when it was made. This is the difference between a database and a record-keeping system.</li>
+                    <li><strong>Lookups are admin-managed.</strong> Countries, languages, roles, formats, pricing categories &mdash; all editable from a Manage Lookups page with no SQL required. The team is never blocked on me to add a value.</li>
+                    <li><strong>Autocomplete across aliases.</strong> Person and film search walks the alias tables, so variant spellings and original-language titles resolve. The museum catalogs international film; search has to meet that bar.</li>
+                    <li><strong>Built for the decade, not the demo.</strong> Naming conventions, relationship patterns, audit tables, and snapshot preservation are the foundation everything downstream rests on. Getting them right during the build is far cheaper than fixing them after years of data entry.</li>
+                </ol>
+
+                <h2>What I Learned</h2>
+
+                <p>The headline lesson: <strong>you cannot fully spec a CMS on paper.</strong> You can put the best architect in the room and it will not matter &mdash; until a tester clicks through a real form, neither they nor you know that payment blocks need to be tied to screening dates, or that countries need to be multiselect tags instead of a dropdown. These are not missed requirements; they are discoveries that only surface in contact with running software. I planned the project in feedback rounds, and every round produced 15&ndash;25 hours of valuable refinement. Treating that as scope creep instead of as the core method would have produced a worse system, faster.</p>
+
+                <p>The second lesson: <strong>in a deeply interconnected data model, every UI change has a blast radius.</strong> A single screening touches film, series, venue, persons, and bookings. Changing how one entity's form behaves often forces changes across three others. I learned to map the relationship blast radius <em>before</em> touching a form, not after &mdash; the diagram is the cheapest debugging tool on a project like this.</p>
+
+                <p>The third lesson, the one I care about most: <strong>build for the decade, not the demo.</strong> The decisions made during the build &mdash; naming, relationship patterns, audit trails, snapshot preservation &mdash; set the ceiling for everything that follows. A sloppy foundation is invisible in the demo and expensive for years. The boring integrity work (audit tables, foreign-key constraints, snapshot copies, alias search) is precisely what makes this a system the museum can run on, rather than a prototype that impresses once.</p>
 
                 <h2>Tech Stack</h2>
+
+                <p>Flask (Python) served by Gunicorn behind Nginx on a Digital Ocean VPS running Ubuntu 24.04. PostgreSQL 16 holds a single normalized schema of 71 tables, 32+ views, and 61 indexes. The frontend is vanilla JavaScript plus HTML templates &mdash; no framework, because the forms are the product and a framework would have added build steps without adding capability. Daily automated backups. The system is live, and the client owns the code in their own Berkeley repository.</p>
+
                 <div class="tech-badges">
                     <span class="tech-badge">PostgreSQL 16</span>
-                    <span class="tech-badge">Python</span>
-                    <span class="tech-badge">Flask</span>
-                    <span class="tech-badge">Nginx</span>
+                    <span class="tech-badge">Python / Flask</span>
                     <span class="tech-badge">Gunicorn</span>
-                    <span class="tech-badge">Digital Ocean</span>
+                    <span class="tech-badge">Nginx</span>
+                    <span class="tech-badge">Digital Ocean (Ubuntu 24.04)</span>
+                    <span class="tech-badge">Vanilla JS + Jinja Templates</span>
                 </div>
 
-                <h2>Key Achievements</h2>
-                <ul>
-                    <li>🎯 <strong>Unified 3 Legacy Systems:</strong> FileMaker, CollectionSpace, Tessitura</li>
-                    <li>🚀 <strong>53-Table Schema:</strong> Consolidated from 55 initial tables</li>
-                    <li>⚡ <strong>Performance Optimized:</strong> Indexed queries for large datasets</li>
-                    <li>🔐 <strong>Role-Based Access:</strong> Berkeley email integration</li>
-                    <li>📊 <strong>Complete Audit Trails:</strong> Full change tracking</li>
-                    <li>🎨 <strong>Modern UI:</strong> Clean, intuitive CMS interface</li>
-                </ul>
+                <h2>Source</h2>
+
+                <p>The codebase lives in the museum's private repository; access details, the production endpoint, and credentials stay off this page. The architecture, the entity-linking pattern, the booking and payment model, and the iterative build method are reproduced faithfully above. Reach out if you'd like a deeper walk-through of the schema, the booking workflow, or how I structure a long-running, iterative CMS engagement where the requirements are discovered on the way.</p>
+
             </div>
         </div>
     </section>
 
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2025. Built with first principles.</p>
+            <p>&copy; Anand Mahajan &middot; <a href="../index.html">Back to portfolio</a></p>
         </div>
     </footer>
 </body>
