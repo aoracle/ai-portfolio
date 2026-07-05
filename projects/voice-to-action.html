@@ -9,6 +9,27 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="../css/project-page.css">
+    <style>
+        /* Diagram + metric styling — local to this page */
+        .arch-diagram { width: 100%; max-width: 760px; height: auto; margin: 24px 0 8px; display: block; font-family: 'Inter', sans-serif; }
+        @media (max-width: 720px) { .arch-diagram .t-sub, .arch-diagram .t-inner { font-size: 10px; } .arch-diagram .t-title, .arch-diagram .t-node-title { font-size: 13px; } }
+        .arch-diagram .box { fill: #ffffff; stroke: #c7c9d1; stroke-width: 1.5; }
+        .arch-diagram .box-accent { fill: #eef0ff; stroke: #4F46E5; stroke-width: 1.5; }
+        .arch-diagram .box-node { fill: #0f1226; stroke: #1f2340; stroke-width: 1.5; }
+        .arch-diagram .box-inner { fill: #1b2040; stroke: #2a2f55; stroke-width: 1; }
+        .arch-diagram .t-title { font-size: 15px; font-weight: 700; fill: #111827; }
+        .arch-diagram .t-sub { font-size: 10.5px; fill: #4b5563; }
+        .arch-diagram .t-node-title { font-size: 14px; font-weight: 700; fill: #f4f5fb; }
+        .arch-diagram .t-node-sub { font-size: 10.5px; fill: #aeb4d4; }
+        .arch-diagram .t-inner { font-size: 10.5px; fill: #cdd2f2; font-family: 'Inter',monospace; }
+        .arch-diagram .t-link { font-size: 11px; font-weight: 600; fill: #4F46E5; }
+        .arch-diagram .link { stroke: #4F46E5; stroke-width: 2; fill: none; }
+        .diagram-caption { font-size: 0.85rem; color: #6b7280; margin: 0 0 24px; font-style: italic; }
+        .metric-strip { display: flex; flex-wrap: wrap; gap: 28px; margin: 8px 0 32px; padding: 16px 20px; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; }
+        .metric-strip .metric { display: flex; flex-direction: column; gap: 2px; }
+        .metric-strip .metric .num { font-family: 'Lora', serif; font-size: 22px; font-weight: 700; color: var(--text); line-height: 1.1; }
+        .metric-strip .metric .lbl { font-size: 11.5px; color: var(--text-secondary); letter-spacing: .2px; text-transform: uppercase; }
+    </style>
 </head>
 <body>
     <nav class="navbar">
@@ -42,6 +63,13 @@
 
                 <p class="lead">I record meetings. Then what? For most people, the recording becomes a 90-minute MP4 they will never open again. For me, it becomes a markdown file in the right project folder within 30 minutes &mdash; classified, summarised, and with action items extracted &mdash; without me touching a keyboard between the recording stopping and the file landing. This case study walks through how that pipeline is built: a Plaud voice recorder on one end, three Python scripts and a shell script in the middle, and Claude as the routing brain at the back.</p>
 
+                <div class="metric-strip" aria-label="Headline metrics">
+                    <div class="metric"><span class="num">~30 min</span><span class="lbl">recording &rarr; routed file</span></div>
+                    <div class="metric"><span class="num">0</span><span class="lbl">manual steps in the loop</span></div>
+                    <div class="metric"><span class="num">2 sync paths</span><span class="lbl">Drive primary &middot; REST backup</span></div>
+                    <div class="metric"><span class="num">&lt; $1 / year</span><span class="lbl">marginal cost vs Otter.ai</span></div>
+                </div>
+
                 <h2>The Problem I Was Solving</h2>
 
                 <p>I run multiple parallel workstreams. Some are consulting engagements with their own jargon and their own ticket numbers. Some are family-side projects with their own document trails. Each one generates voice context every week &mdash; standups, design discussions, phone calls with lawyers, conversations with my parents. A recording-to-text tool is necessary but nowhere near sufficient. The transcript itself is just more raw material. The real question is: <strong>where does the transcript belong, and what does it commit me to do next?</strong></p>
@@ -52,48 +80,70 @@
 
                 <h2>System Architecture</h2>
 
-                <p>The pipeline has four stages, each isolated from the next by a flat file or a folder. There is no message bus, no webhook, no worker queue. Every handoff is a directory on disk or a markdown file:</p>
+                <p>The pipeline has four stages, each isolated from the next by a flat file or a folder. There is no message bus, no webhook, no worker queue. Every handoff is a directory on disk or a markdown file. The intentional choice at every boundary is to use a flat file instead of a service: the sync state is a JSON file, the queue is a markdown file, the prompt is a markdown file, the destination is a directory. If anything breaks, the failure point is one of three Python scripts or one shell script &mdash; not a vendor outage, not an expired webhook, not a queue that drained without me knowing.</p>
 
-<pre><code>┌──────────────────────────────────────────────────────────────┐
-│  STAGE 1 — Capture                                           │
-│  Plaud voice recorder (carried in pocket)                    │
-│    • Hardware button → record                                │
-│    • Audio uploaded to Plaud cloud                           │
-│    • Plaud's service transcribes + diarises (speaker turns)  │
-└──────────────────────────────────────────────────────────────┘
-                              ↓
-┌──────────────────────────────────────────────────────────────┐
-│  STAGE 2 — Sync (dual-path)                                  │
-│                                                              │
-│  PRIMARY:  Plaud → Google Drive ("Plaud Transcripts" folder) │
-│            fetch_from_google_drive.py  (OAuth, no token)     │
-│                                                              │
-│  BACKUP:   Plaud REST API (api.plaud.ai)                     │
-│            fetch_transcripts.py  (bearer token, ~10mo TTL)   │
-│                                                              │
-│  Both write to:  ANAND/inbox/plaud/YYYY-MM-DD_HH-MM_*.md     │
-└──────────────────────────────────────────────────────────────┘
-                              ↓
-┌──────────────────────────────────────────────────────────────┐
-│  STAGE 3 — Routing brain (every 15 min)                      │
-│  notes_processor/process_notes.sh on the Mac                 │
-│    1. Pull queue from public dashboard                       │
-│    2. Bail if empty                                          │
-│    3. Pipe queue + PROMPT.md → claude --print                │
-│    4. Clear remote queue on success                          │
-└──────────────────────────────────────────────────────────────┘
-                              ↓
-┌──────────────────────────────────────────────────────────────┐
-│  STAGE 4 — Project folders (the payoff)                      │
-│    INN/notes/YYYY-MM-DD.md         (Capital Group work)      │
-│    TTT/notes/sap/YYYY-MM-DD.md     (UNFI / SAP)              │
-│    TTT/notes/data_engineering/...  (UNFI / DE)               │
-│    BAMPFA/notes/YYYY-MM-DD.md      (museum project)          │
-│    cars180/notes/YYYY-MM-DD.md     (side project)            │
-│    ANAND/notes/voice/YYYY-MM-DD.md (personal log, always)    │
-└──────────────────────────────────────────────────────────────┘</code></pre>
+<svg class="arch-diagram" viewBox="0 0 820 640" role="img" aria-label="Architecture diagram of the voice-to-action pipeline">
+  <!-- STAGE 1 — Capture -->
+  <rect x="40" y="16" width="740" height="76" rx="8" class="box-accent"/>
+  <text x="60" y="40" class="t-title">Stage 1 &mdash; Capture</text>
+  <text x="60" y="60" class="t-sub">Plaud voice recorder (carried in pocket) &middot; one hardware button</text>
+  <text x="60" y="78" class="t-sub">audio uploaded &rarr; Plaud cloud transcribes + diarises (speaker turns)</text>
 
-                <p>The intentional choice at every boundary is to use a flat file or a folder instead of a service. The sync state is a JSON file. The queue is a markdown file. The prompt is a markdown file. The destination is a directory. If anything breaks, the failure point is one of three Python scripts or one shell script &mdash; not a vendor outage, not an expired webhook, not a queue that drained without me knowing.</p>
+  <line x1="410" y1="92" x2="410" y2="124" class="link" marker-end="url(#arrow)"/>
+  <text x="420" y="112" class="t-link">markdown transcript</text>
+
+  <!-- STAGE 2 — Sync dual-path -->
+  <rect x="40" y="126" width="740" height="156" rx="8" class="box-node"/>
+  <text x="60" y="150" class="t-node-title">Stage 2 &mdash; Dual-path sync (the most important design decision)</text>
+  <!-- Inner: primary -->
+  <rect x="60" y="164" width="345" height="104" rx="6" class="box-inner"/>
+  <text x="232" y="186" text-anchor="middle" class="t-inner">PRIMARY &mdash; Google Drive</text>
+  <text x="232" y="206" text-anchor="middle" class="t-inner">fetch_from_google_drive.py</text>
+  <text x="232" y="226" text-anchor="middle" class="t-inner">OAuth (no extra token)</text>
+  <text x="232" y="246" text-anchor="middle" class="t-inner">drive_sync_state.json</text>
+  <text x="232" y="262" text-anchor="middle" class="t-inner" style="font-style:italic;">~ weekly polling</text>
+  <!-- Inner: backup -->
+  <rect x="415" y="164" width="345" height="104" rx="6" class="box-inner"/>
+  <text x="587" y="186" text-anchor="middle" class="t-inner">BACKUP &mdash; Plaud REST API</text>
+  <text x="587" y="206" text-anchor="middle" class="t-inner">fetch_transcripts.py</text>
+  <text x="587" y="226" text-anchor="middle" class="t-inner">bearer token (~10-mo TTL)</text>
+  <text x="587" y="246" text-anchor="middle" class="t-inner">/file/simple/web &rarr; /file/detail/{id}</text>
+  <text x="587" y="262" text-anchor="middle" class="t-inner" style="font-style:italic;">gzip + signed S3 URL</text>
+
+  <line x1="410" y1="282" x2="410" y2="316" class="link" marker-end="url(#arrow)"/>
+  <text x="420" y="304" class="t-link">both write the same format</text>
+
+  <!-- Inbox (small accent) -->
+  <rect x="180" y="318" width="460" height="58" rx="8" class="box-accent"/>
+  <text x="410" y="340" text-anchor="middle" class="t-title" style="font-size:13px;">inbox/plaud/YYYY-MM-DD_HH-MM_Title.md</text>
+  <text x="410" y="358" text-anchor="middle" class="t-sub">YAML header &middot; summary &middot; timestamped transcript</text>
+
+  <line x1="410" y1="376" x2="410" y2="398" class="link" marker-end="url(#arrow)"/>
+
+  <!-- STAGE 3 — Routing brain -->
+  <rect x="40" y="400" width="740" height="120" rx="8" class="box-node"/>
+  <text x="60" y="424" class="t-node-title">Stage 3 &mdash; Routing brain (15-min cron on the Mac)</text>
+  <text x="60" y="442" class="t-node-sub">process_notes.sh &middot; pull queue &rarr; bail if empty &rarr; claude -p "$(cat PROMPT.md)" &rarr; clear on success</text>
+  <rect x="60" y="454" width="700" height="56" rx="6" class="box-inner"/>
+  <text x="410" y="476" text-anchor="middle" class="t-inner">PROMPT.md = decision tree: filter Plaud noise &middot; classify by keyword + context</text>
+  <text x="410" y="496" text-anchor="middle" class="t-inner">fuzzy name correction (&ldquo;Cap Group&rdquo; &rarr; Capital Group) &middot; Claude routes, not regex</text>
+
+  <line x1="410" y1="520" x2="410" y2="552" class="link" marker-end="url(#arrow)"/>
+  <text x="420" y="540" class="t-link">routed markdown</text>
+
+  <!-- STAGE 4 — Project folders -->
+  <rect x="40" y="554" width="740" height="68" rx="8" class="box-accent"/>
+  <text x="60" y="578" class="t-title">Stage 4 &mdash; Project folders (the payoff)</text>
+  <text x="60" y="596" class="t-sub">INN/notes &middot; TTT/notes/sap &middot; TTT/notes/data_engineering &middot; BAMPFA/notes &middot; cars180/notes</text>
+  <text x="60" y="614" class="t-sub" style="font-style:italic;">always also: ANAND/notes/voice/YYYY-MM-DD.md &mdash; central chronological voice log</text>
+
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#4F46E5"/>
+    </marker>
+  </defs>
+</svg>
+                <p class="diagram-caption">Four stages, each isolated by a file or a directory. Stage 2 (dark) is the most important design decision: two independent sync paths writing the same markdown format, so either can fail for weeks without breaking the pipeline.</p>
 
                 <h2>Component 1 &mdash; Capture: Why a Hardware Recorder</h2>
 
