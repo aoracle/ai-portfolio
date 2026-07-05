@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Self-Hosted LLM Cluster on 2&times; DGX Spark | AI Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/project-page.css">
+    <style>
+        /* Diagram styling — local to this page */
+        .arch-diagram { width: 100%; max-width: 820px; height: auto; margin: 24px 0 8px; display: block; font-family: 'Inter', sans-serif; }
+        .arch-diagram .box { fill: #ffffff; stroke: #c7c9d1; stroke-width: 1.5; }
+        .arch-diagram .box-accent { fill: #eef0ff; stroke: #4F46E5; stroke-width: 1.5; }
+        .arch-diagram .box-node { fill: #0f1226; stroke: #1f2340; stroke-width: 1.5; }
+        .arch-diagram .box-inner { fill: #1b2040; stroke: #2a2f55; stroke-width: 1; }
+        .arch-diagram .box-fabric { fill: #4F46E5; stroke: #3b35b8; stroke-width: 1.5; }
+        .arch-diagram .t-title { font-size: 15px; font-weight: 700; fill: #111827; }
+        .arch-diagram .t-sub { font-size: 11.5px; fill: #4b5563; }
+        .arch-diagram .t-node-title { font-size: 15px; font-weight: 700; fill: #f4f5fb; }
+        .arch-diagram .t-node-sub { font-size: 11px; fill: #aeb4d4; }
+        .arch-diagram .t-inner { font-size: 11.5px; fill: #cdd2f2; font-family: 'Inter',monospace; }
+        .arch-diagram .t-link { font-size: 11px; font-weight: 600; fill: #4F46E5; }
+        .arch-diagram .t-fabric { font-size: 12px; font-weight: 700; fill: #ffffff; letter-spacing: .3px; }
+        .arch-diagram .link { stroke: #4F46E5; stroke-width: 2; fill: none; }
+        .arch-diagram .link-fabric { stroke: #4F46E5; stroke-width: 6; fill: none; opacity: .85; }
+        .diagram-caption { font-size: 0.85rem; color: #6b7280; margin: 0 0 24px; font-style: italic; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">AI Portfolio</a>
+            <ul class="nav-menu">
+                <li><a href="../index.html#projects">All Projects</a></li>
+                <li><a href="../index.html#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="project-header">
+        <div class="container">
+            <a href="../index.html#projects" class="back-link">&larr; Back to Projects</a>
+            <h1 class="project-page-title">Self-Hosted LLM Cluster on 2&times; NVIDIA DGX Spark</h1>
+            <p class="project-page-tagline">A two-node GB10 Grace Blackwell cluster wired with 200 Gb/s fabric, running distributed vLLM&nbsp;+&nbsp;Ray inference on hardware I own &mdash; so the models, the data, and the latency are mine, not a metered API.</p>
+            <div class="project-page-badges">
+                <span class="badge">On-Prem LLM Inference</span>
+                <span class="badge">2&times; DGX Spark (GB10)</span>
+                <span class="badge">200 Gb/s Fabric</span>
+                <span class="badge">vLLM + Ray (TP=2)</span>
+                <span class="badge">NVFP4 Quantization</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="project-content">
+        <div class="container">
+            <div class="readme-content">
+
+                <p class="lead">Cloud LLM APIs are excellent and I use them daily. They are also a metered hose: cost compounds with usage, every prompt leaves my machine, and the interesting part &mdash; how inference actually runs &mdash; stays behind someone else's endpoint. I wanted the capable models <em>here</em>, on my desk, running on silicon I control, with my trading data never leaving the LAN. So I stood up a two-node NVIDIA DGX Spark cluster, linked them at 200&nbsp;Gb/s, and worked through the unglamorous plumbing required to actually serve a modern model across both of them. This is that system.</p>
+
+                <h2>The Problem I Was Solving</h2>
+
+                <p>Three things pushed me toward owning the inference layer. First, <strong>cost shape</strong>: my trading research and agent loops fire a lot of tokens, and per-token pricing that looks trivial on a demo becomes the line item that matters at volume. Second, <strong>data residency</strong>: a meaningful slice of what I want a model to reason over &mdash; positions, flow, proprietary signals &mdash; shouldn't have to leave my network to be processed. Third, <strong>understanding</strong>: I am suspicious of infrastructure I depend on but can't see inside. Running the full stack &mdash; fabric, NCCL, quantization format, serving runtime, tool-call parser &mdash; is the only way to actually learn where the sharp edges are.</p>
+
+                <p>The NVIDIA DGX Spark (GB10 Grace Blackwell, 128&nbsp;GB unified memory) made it concrete. Two of them on a LAN, connected by ConnectX-7 fabric, is a real little datacenter. The question became: <em>what does it take to serve a capable model across both nodes, correctly, with agent tool-use on top?</em> The answer turned out to be about 10% model and 90% plumbing &mdash; exactly the lesson I came for.</p>
+
+                <h2>System Architecture</h2>
+
+                <p>Three machines: a MacBook Pro as the dedicated controller (where I work, where the editor and SSH client live), and two DGX Spark nodes forming the GPU cluster. The nodes are linked by a 200&nbsp;Gb/s ConnectX-7 fabric brought up by NVIDIA's Sync Cluster Assistant. Models are served with vLLM, distributed across both nodes by Ray at tensor-parallel&nbsp;=&nbsp;2, and an OpenCode agent layer talks to the resulting OpenAI-compatible endpoint.</p>
+
+<svg class="arch-diagram" viewBox="0 0 820 560" role="img" aria-label="Architecture diagram of the two-node DGX Spark LLM cluster">
+  <!-- Controller -->
+  <rect x="300" y="16" width="220" height="60" rx="8" class="box-accent"/>
+  <text x="410" y="40" text-anchor="middle" class="t-title">Controller &mdash; 16" MacBook Pro</text>
+  <text x="410" y="58" text-anchor="middle" class="t-sub">editor &middot; SSH client &middot; NVIDIA Sync</text>
+
+  <!-- Controller -> spark1 link -->
+  <line x1="410" y1="76" x2="410" y2="108" class="link" marker-end="url(#arrow)"/>
+  <text x="490" y="96" class="t-link">LAN / SSH</text>
+
+  <!-- Node 1: spark1 (head) -->
+  <rect x="40" y="110" width="330" height="150" rx="10" class="box-node"/>
+  <text x="205" y="134" text-anchor="middle" class="t-node-title">Node 1 &mdash; spark1 (head)</text>
+  <text x="205" y="152" text-anchor="middle" class="t-node-sub">DGX Spark &middot; GB10 Grace Blackwell &middot; 128 GB unified</text>
+  <rect x="62" y="166" width="286" height="78" rx="6" class="box-inner"/>
+  <text x="205" y="188" text-anchor="middle" class="t-inner">Ray head &middot; vLLM (NGC 26.05)</text>
+  <text x="205" y="208" text-anchor="middle" class="t-inner">Docker &middot; NCCL over fabric</text>
+  <text x="205" y="228" text-anchor="middle" class="t-inner">tensor-parallel shard &middot; NVFP4</text>
+
+  <!-- Node 2: spark2 (worker) -->
+  <rect x="450" y="110" width="330" height="150" rx="10" class="box-node"/>
+  <text x="615" y="134" text-anchor="middle" class="t-node-title">Node 2 &mdash; spark2 (worker)</text>
+  <text x="615" y="152" text-anchor="middle" class="t-node-sub">DGX Spark &middot; GB10 Grace Blackwell &middot; 128 GB unified</text>
+  <rect x="472" y="166" width="286" height="78" rx="6" class="box-inner"/>
+  <text x="615" y="188" text-anchor="middle" class="t-inner">Ray worker &middot; vLLM</text>
+  <text x="615" y="208" text-anchor="middle" class="t-inner">Docker &middot; GLOO socket</text>
+  <text x="615" y="228" text-anchor="middle" class="t-inner">tensor-parallel shard &middot; NVFP4</text>
+
+  <!-- Fabric link between the two nodes -->
+  <line x1="370" y1="185" x2="450" y2="185" class="link-fabric"/>
+  <text x="410" y="178" text-anchor="middle" class="t-fabric">200 Gb/s</text>
+  <text x="410" y="200" text-anchor="middle" class="t-fabric">fabric</text>
+
+  <!-- Down to serving bar -->
+  <line x1="205" y1="260" x2="205" y2="290" class="link"/>
+  <line x1="615" y1="260" x2="615" y2="290" class="link"/>
+  <line x1="205" y1="290" x2="615" y2="290" class="link"/>
+
+  <!-- Distributed serving layer bar -->
+  <rect x="40" y="290" width="740" height="54" rx="8" class="box-accent"/>
+  <text x="410" y="313" text-anchor="middle" class="t-title">Distributed Inference Layer</text>
+  <text x="410" y="332" text-anchor="middle" class="t-sub">vLLM (NGC nvcr.io/nvidia/vllm:26.05) + Ray &middot; tensor-parallel = 2 &middot; NVFP4 on GB10 &middot; OpenAI-compatible endpoint</text>
+
+  <!-- Agent layer (right) -> serving -->
+  <rect x="610" y="372" width="170" height="54" rx="8" class="box"/>
+  <text x="695" y="395" text-anchor="middle" class="t-title" style="font-size:13px;">Agent Layer</text>
+  <text x="695" y="412" text-anchor="middle" class="t-sub">OpenCode &middot; tool-use parsers</text>
+  <line x1="695" y1="372" x2="500" y2="344" class="link" marker-end="url(#arrow)"/>
+
+  <!-- Served models row -->
+  <rect x="40" y="372" width="520" height="120" rx="8" class="box"/>
+  <text x="60" y="395" class="t-title" style="font-size:13px;">Models served on the cluster</text>
+  <text x="60" y="416" class="t-sub">&bull; Qwen3.6-35B-A3B (NVFP4) &mdash; the capable path, ~13 tok/s, coherent</text>
+  <text x="60" y="435" class="t-sub">&bull; Qwen2.5-Coder-32B (GGUF via llama.cpp, 128k ctx) &mdash; ~10 tok/s</text>
+  <text x="60" y="454" class="t-sub">&bull; Targets: Llama-3.3-70B-NVFP4, DeepSeek-V4-Flash (1M ctx, ~1800 prefill / 40 gen)</text>
+  <text x="60" y="476" class="t-sub" style="font-style:italic;">Long context via YaRN; tool-calls via hermes / qwen3_coder parsers.</text>
+
+  <!-- defs: arrowhead -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#4F46E5"/>
+    </marker>
+  </defs>
+</svg>
+                <p class="diagram-caption">Two DGX Spark nodes (dark) form the cluster; the controller orchestrates over the LAN. vLLM + Ray split each model across both nodes at tensor-parallel&nbsp;=&nbsp;2; an OpenCode agent layer consumes the endpoint.</p>
+
+                <h2>The Hardware</h2>
+
+                <p>Two NVIDIA DGX Spark units, each a GB10 Grace Blackwell SoC with 128&nbsp;GB of unified memory (note: <code>nvidia-smi</code> reports <code>[N/A]</code> for memory on GB10 because it's unified, not discrete VRAM &mdash; normal, not an error). They run DGX&nbsp;OS / Ubuntu 24.04, driver pinned at 580. The two nodes are joined by a 200&nbsp;Gb/s ConnectX-7 fabric (CX7) that NVIDIA's Sync Cluster Assistant stands up &mdash; it handles the fabric bring-up and node-to-node SSH. Everything is headless and survives reboots. The MacBook Pro is the dedicated controller; I never run the cluster from a node's attached monitor.</p>
+
+                <h2>The Serving Stack</h2>
+
+                <p>The serving runtime is <strong>vLLM</strong>, run from NVIDIA's NGC container, with <strong>Ray</strong> orchestrating the two-node distributed serve at tensor-parallel&nbsp;=&nbsp;2. NCCL and GLOO are pinned to the fabric interfaces (<code>NCCL_SOCKET_IFNAME</code>, <code>GLOO_SOCKET_IFNAME</code>), InfiniBand disabled in favor of the Ethernet fabric, and the head node starts the Ray cluster while the worker joins over SSH. The endpoint is OpenAI-compatible, which is what lets any agent framework plug in without modification.</p>
+
+<pre><code># head node (spark1) &mdash; starts Ray + serves the model across both nodes
+docker run -d --name ray-head --gpus all --network host --ipc host \
+  -e NCCL_SOCKET_IFNAME=enp1s0f0np0 -e GLOO_SOCKET_IFNAME=enp1s0f0np0 \
+  -e NCCL_IB_DISABLE=1 -e VLLM_HOST_IP=&lt;head-fabric-ip&gt; \
+  -v /models:/models:ro nvcr.io/nvidia/vllm:26.05-py3 \
+  bash -c "ray start --head --port=6385 --num-gpus=1 && sleep 55 && \
+    vllm serve /models/&lt;MODEL&gt; --tensor-parallel-size 2 \
+    --gpu-memory-utilization 0.5 --max-model-len 32768 \
+    --enable-auto-tool-choice --tool-call-parser hermes"</code></pre>
+
+                <h2>The Model-Selection Journey (the real engineering)</h2>
+
+                <p>This is where the time went, and it's the part worth documenting. Serving <em>a</em> model is easy; serving a <em>capable</em> model on brand-new silicon (GB10) is a moving target. The path:</p>
+
+                <ul>
+                    <li><strong>vLLM 0.19 failed on modern models.</strong> Tokenizer/arch errors on current Qwen and DeepSeek releases &mdash; the runtime hadn't caught up to the model formats yet.</li>
+                    <li><strong>Never serve a GGUF on vLLM 0.19.</strong> Its experimental GGUF loader <em>silently corrupts weights</em> &mdash; the server starts, returns output, and the output is garbage. Confirmed on Qwen2.5-72B-Q4 at both TP=2 and TP=1, so it isn't a parallelism bug. Use <strong>llama.cpp</strong> (<code>llama-server</code>) for GGUF; it serves them correctly.</li>
+                    <li><strong>The capable-model path (found after real digging):</strong> NGC <code>nvcr.io/nvidia/vllm:26.05-py3</code> &mdash; vLLM&nbsp;0.20.1 + transformers&nbsp;5.6.0 &mdash; serves <strong>Qwen3.6-35B-A3B-NVFP4</strong> correctly on GB10: coherent, ~13&nbsp;tok/s, NVFP4 quantization. The right runtime version was the unlock, not a newer one.</li>
+                    <li><strong>Tool-call parsers are per-model.</strong> Qwen2.5 emits the Hermes format (&ndash;&ndash;<code>tool-call-parser hermes</code>); Qwen3.6 emits XML <code>&lt;function=...&gt;</code> blocks (&ndash;&ndash;<code>tool-call-parser qwen3_coder</code>). Get this wrong and agents get <code>400 auto tool choice requires...</code> or silently never call tools.</li>
+                    <li><strong>Long context via YaRN.</strong> Pushing past training context needs <code>--rope-scaling yarn</code> with careful JSON (the docker <code>bash -c</code> wrapper is fragile), plus Qwen-specific <code>--override-kv qwen2.context_length=int:131072</code> or vLLM caps at training length.</li>
+                </ul>
+
+                <p>Throughput on the cluster today: ~13&nbsp;tok/s on the 35B NVFP4 model, ~10&nbsp;tok/s on the 32B coder at 128k context. Bigger targets (Llama-3.3-70B-NVFP4, DeepSeek-V4-Flash at W4A16 with 1M context) are projected around ~1800&nbsp;tok/s prefill / 40&nbsp;tok/s generation once the vLLM&nbsp;0.22 line is stable on GB10.</p>
+
+                <h2>Agent Layer on Top</h2>
+
+                <p>A model is only useful if something drives it. I run <strong>OpenCode</strong> as the agent loop on the head node, pointed at the cluster's OpenAI-compatible endpoint. Generation and agentic bash tool-use are both verified end-to-end in-window. The one open edge: reasoning models (Qwen3.6 is a <em>thinking</em> model) make the agentic <em>tool-execution</em> loop unreliable &mdash; with the reasoning parser on, the agent waits on <code>content</code> while vLLM streams <code>reasoning_content</code> and hangs; without it, the model narrates and skips the tool call. Raw generation and curl-level tool calls work today; closing that agent loop is the next milestone.</p>
+
+                <h2>Why It Works &mdash; Design Decisions</h2>
+
+                <ol>
+                    <li><strong>Own the hardware.</strong> No per-token tax, no data egress, no rate limits, no model deprecations I didn't choose. The cluster is a fixed cost that gets cheaper every time I use it.</li>
+                    <li><strong>NVFP4 to fit capability in 128&nbsp;GB.</strong> A 70B-class model doesn't fit one Spark at full precision; NVFP4 quantization is what makes a capable model servable on this hardware at useful throughput.</li>
+                    <li><strong>Ray for multi-node tensor parallelism.</strong> Two single-node serves would have been simpler but would cap model size at what fits one 128&nbsp;GB unit. TP=2 across the fabric doubles the addressable memory and is the whole point of clustering.</li>
+                    <li><strong>Reproducible, not one-off.</strong> Every working configuration is captured as a versioned serve script + a validated-recipe doc, so bringing the cluster back after a driver update or a model swap is a known procedure, not an archaeology project.</li>
+                    <li><strong>Honest about the frontier.</strong> I document what works <em>and</em> what doesn't (GGUF-on-vLLM corruption, the reasoning-agent loop). The gotchas are the most valuable output of the project; hiding them would make it marketing, not engineering.</li>
+                </ol>
+
+                <h2>What I Learned</h2>
+
+                <p>The headline lesson: <strong>distributed inference is 10% model and 90% plumbing.</strong> The model is a file. The hard, interesting work is NCCL over a fabric, picking the quantization format the runtime actually supports, matching the tool-call parser to the model's emission format, and pinning driver/runtime versions that haven't drifted past each other. None of that is visible from an API.</p>
+
+                <p>Second: <strong>the quantization format and the serving runtime are a coupled pair.</strong> A model that "works" on paper (right size, right license) is useless if your runtime silently mangles its weights in that format. You find out by reading the output, not the startup log.</p>
+
+                <p>Third, and the one I'm still working on: <strong>the agent loop is the real frontier, not raw generation.</strong> Getting tokens out of a local model is a solved problem. Getting a reasoning model to reliably <em>execute</em> a tool call inside an agent loop &mdash; where the runtime streams <code>reasoning_content</code> the agent doesn't know to wait on &mdash; is where the next real work is.</p>
+
+                <h2>Tech Stack</h2>
+
+                <p>Hardware: 2&times; NVIDIA DGX Spark (GB10 Grace Blackwell, 128&nbsp;GB unified memory each) + MacBook Pro controller. Networking: ConnectX-7 200&nbsp;Gb/s fabric, NVIDIA Sync Cluster Assistant, LAN over Ethernet. Serving: vLLM (NGC container, 0.20.1), Ray (distributed, TP=2), Docker, NCCL/GLOO, llama.cpp for GGUF. Models: Qwen3.6-35B-A3B (NVFP4), Qwen2.5-Coder-32B, with Llama-3.3-70B-NVFP4 and DeepSeek-V4-Flash as targets. Quantization: NVFP4 (primary), W4A16, GGUF Q4 (via llama.cpp). Agent layer: OpenCode with hermes / qwen3_coder tool-call parsers. OS: DGX OS / Ubuntu 24.04, driver pinned at 580.</p>
+
+                <h2>Source</h2>
+
+                <p>The cluster is private infrastructure &mdash; access details, network topology, and credentials stay off the public site. The architecture, the serving configuration (head/worker Ray + vLLM startup), the validated model &times; runtime matrix, and the gotchas are reproduced faithfully above. Reach out if you'd like a deeper walk-through of distributed vLLM on GB10, NVFP4 serving, or standing up a multi-node inference cluster of your own.</p>
+
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; Anand Mahajan &middot; <a href="../index.html">Back to portfolio</a></p>
+        </div>
+    </footer>
+</body>
+</html>

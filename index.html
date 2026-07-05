@@ -104,9 +104,9 @@
             <div class="filter-bar-wrapper" style="margin-bottom: 32px;">
                 <p style="color: #666; font-size: 0.85rem; margin-bottom: 10px; font-weight: 500;">FILTER BY TECH OR CATEGORY:</p>
                 <div class="chip-row">
-                    <span class="filter-chip active" data-filter="all">All (13)</span>
+                    <span class="filter-chip active" data-filter="all">All (14)</span>
                     <span class="filter-chip" data-filter="enterprise">Enterprise (4)</span>
-                    <span class="filter-chip" data-filter="personal">Personal AI (4)</span>
+                    <span class="filter-chip" data-filter="personal">Personal AI (5)</span>
                     <span class="filter-chip" data-filter="browser">Browser (1)</span>
                     <span class="filter-chip" data-filter="trading">Trading (1)</span>
                     <span class="filter-chip" data-filter="media">Media (3)</span>
@@ -292,6 +292,38 @@
                     <h3 class="category-title">Personal AI Infrastructure</h3>
                     <p class="category-subtitle">Daily-use tools so AI works for me, not the other way around</p>
                     <div class="projects-grid">
+<!-- Project: Self-Hosted LLM Cluster on 2x DGX Spark -->
+                <div class="project-card">
+                    <div class="project-badge">Active</div>
+                    <h3 class="project-title has-tooltip"><a href="projects/dgx-spark.html" class="project-link">Self-Hosted LLM Cluster (2&times; DGX Spark)</a>
+                        <div class="tooltip">
+                            <strong>Distributed LLM inference on owned hardware</strong>
+                            <p>Two NVIDIA DGX Spark nodes (GB10, 128&nbsp;GB each) linked at 200&nbsp;Gb/s, serving vLLM + Ray at tensor-parallel&nbsp;=&nbsp;2 with NVFP4 &mdash; agent-ready, fully on-prem.</p>
+                            <ul>
+                                <li><strong>2&times; DGX Spark (GB10 Grace Blackwell):</strong> 128&nbsp;GB unified memory per node, headless cluster</li>
+                                <li><strong>200&nbsp;Gb/s ConnectX-7 fabric:</strong> Ray tensor-parallel&nbsp;=&nbsp;2 across both nodes</li>
+                                <li><strong>Capable-model path:</strong> Qwen3.6-35B-A3B NVFP4 @ ~13&nbsp;tok/s on GB10</li>
+                                <li><strong>Agent layer:</strong> OpenCode tool-use, no data leaving the LAN</li>
+                            </ul>
+                            <span class="tooltip-tech">DGX Spark • vLLM • Ray • NVFP4 • Docker • ConnectX-7</span>
+                        </div>
+                    </h3>
+                    <p class="project-description">A two-node GB10 cluster on 200&nbsp;Gb fabric running distributed vLLM&nbsp;+&nbsp;Ray inference &mdash; capable models, agent tool-use, zero data leaving the LAN. Owning the inference layer instead of metering it.</p>
+                    <div class="project-metrics">
+                        <span class="metric"><strong>2&times;</strong> DGX Spark</span>
+                        <span class="metric"><strong>200 Gb/s</strong> Fabric</span>
+                        <span class="metric"><strong>~13 tok/s</strong> 35B NVFP4</span>
+                    </div>
+                    <div class="project-tech">
+                        <span class="tech-badge">DGX Spark</span>
+                        <span class="tech-badge">vLLM</span>
+                        <span class="tech-badge">Ray</span>
+                        <span class="tech-badge">NVFP4</span>
+                        <span class="tech-badge">Docker</span>
+                    </div>
+                    <div class="card-meta" style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #ddd; font-size: 0.82rem; color: #666;"><div><strong>Active:</strong> Jun 2026 &mdash; Ongoing</div><div style="margin-top: 4px;"><em>Models, data, and latency on my desk &mdash; not a metered API.</em></div></div>
+                    <a href="projects/dgx-spark.html" class="btn-details">View Details &rarr;</a>
+                </div>
 <!-- Project 10: Gajadata Life-OS -->
                 <div class="project-card">
                     <div class="project-badge">Production</div>
