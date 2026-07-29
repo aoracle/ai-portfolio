@@ -46,7 +46,7 @@
                 <span class="stat-label">Years Experience</span>
             </div>
             <div class="stat">
-                <span class="stat-number">13</span>
+                <span class="stat-number">14</span>
                 <span class="stat-label">AI Projects</span>
             </div>
             <div class="stat">
@@ -98,7 +98,7 @@
     <section id="projects" class="projects">
         <div class="container">
             <h2 class="section-title">AI Projects</h2>
-            <p class="section-subtitle">13 production systems organized into 5 categories</p>
+            <p class="section-subtitle">14 production systems organized into 5 categories</p>
 
             <style>
                 .projects-categories { display: flex; flex-direction: column; gap: 56px; }
@@ -109,8 +109,8 @@
             <div class="filter-bar-wrapper" style="margin-bottom: 32px;">
                 <p style="color: #666; font-size: 0.85rem; margin-bottom: 10px; font-weight: 500;">FILTER BY TECH OR CATEGORY:</p>
                 <div class="chip-row">
-                    <span class="filter-chip active" data-filter="all">All (14)</span>
-                    <span class="filter-chip" data-filter="enterprise">Enterprise (4)</span>
+                    <span class="filter-chip active" data-filter="all">All (15)</span>
+                    <span class="filter-chip" data-filter="enterprise">Enterprise (5)</span>
                     <span class="filter-chip" data-filter="personal">Personal AI (5)</span>
                     <span class="filter-chip" data-filter="browser">Browser (1)</span>
                     <span class="filter-chip" data-filter="trading">Trading (1)</span>
@@ -142,6 +142,46 @@
                     <h3 class="category-title">Enterprise Data & AI</h3>
                     <p class="category-subtitle">Production data systems for enterprise and museum clients</p>
                     <div class="projects-grid">
+<!-- Project 15: Legal Knowledge Graph -->
+                <div class="project-card-showcase" data-tags="enterprise python claude mcp">
+                    <div class="showcase-preview">
+                        <img src="images/projects/knowledge-graph-preview.png" alt="Legal Knowledge Graph - 375 entities in 74 communities from 450+ legal documents" class="showcase-image clickable-image" onclick="openLightbox(this.src)">
+                    </div>
+                    <div class="showcase-content">
+                        <div class="project-badge">Production</div>
+                        <h3 class="project-title has-tooltip">
+                            <a href="projects/knowledge-graph.html" class="project-link-dark">Legal Knowledge Graph</a>
+                            <div class="tooltip">
+                                <strong>450+ Legal Documents &rarr; Provenance-Tagged Entity Graph</strong>
+                                <p>Knowledge graph built from a real 40-year litigation corpus &mdash; deeds, court orders, government records, handwritten documents in two languages.</p>
+                                <ul>
+                                    <li><strong>LLM Extraction:</strong> Parallel subagents + vision models for scanned docs</li>
+                                    <li><strong>Honesty Model:</strong> Every edge tagged EXTRACTED / INFERRED / AMBIGUOUS with confidence</li>
+                                    <li><strong>Community Detection:</strong> 74 clusters surfaced cross-document connections humans missed</li>
+                                    <li><strong>Neo4j:</strong> 833 idempotent Cypher statements + bolt push</li>
+                                    <li><strong>GraphRAG:</strong> BFS/DFS retrieval, ~250x token reduction with per-node citations</li>
+                                </ul>
+                                <span class="tooltip-tech">Python &bull; NetworkX &bull; Neo4j &bull; Claude &bull; GraphRAG &bull; MCP</span>
+                            </div>
+                        </h3>
+                        <p class="project-tagline-dark">40-Year Litigation Corpus as a Queryable Entity Graph</p>
+                        <p class="project-description">LLM-agent pipeline turning 450+ real legal documents (1940&ndash;2026) into a provenance-tagged knowledge graph: 375 entities, 455 relationships, 74 detected communities. Neo4j export, GraphRAG retrieval with source citations, and cross-document inferences that manual review never found.</p>
+                        <div class="project-metrics">
+                            <span class="metric"><strong>375</strong> Entities</span>
+                            <span class="metric"><strong>74</strong> Communities</span>
+                            <span class="metric"><strong>~250x</strong> Token Reduction</span>
+                        </div>
+                        <div class="project-tech">
+                            <span class="tech-badge">Python</span>
+                            <span class="tech-badge">NetworkX</span>
+                            <span class="tech-badge">Neo4j</span>
+                            <span class="tech-badge">Claude</span>
+                            <span class="tech-badge">GraphRAG</span>
+                        </div>
+                        <div class="card-meta" style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #ddd; font-size: 0.82rem; color: #666;"><div><strong>Active:</strong> Apr 2026 &mdash; Present</div><div style="margin-top: 4px;"><em>In legal work an invented connection is worse than a missing one &mdash; every edge carries provenance and confidence.</em></div></div>
+                    <a href="projects/knowledge-graph.html" class="btn-details-dark">View Details &rarr;</a>
+                    </div>
+                </div>
 <!-- Project 9: BAMPFA CMS -->
                 <div class="project-card-showcase">
                     <div class="showcase-preview">
