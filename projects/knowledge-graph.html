@@ -73,6 +73,8 @@
                 <p>A 10-acre land parcel purchased in 1983&ndash;84 through a housing society, with an ownership chain reaching back to 1940 and an active dispute. The evidence lived in four decades of paper: 150+ scanned deeds and receipts, court records from multiple suits, government 7/12 extracts and khasra records, sanctioned layout maps &mdash; some handwritten in Marathi. No single person could hold the full picture. A question like <em>&ldquo;how does the 1987 receipt connect to the ownership gap the opposing party claims?&rdquo;</em> took days of manual cross-referencing across folders.</p>
 
                 <h2>The Pipeline</h2>
+                <img src="../images/projects/kg-pipeline.png" alt="Legal Knowledge Graph — full GraphRAG pipeline: extraction, graph build, community analysis, lexical+BFS retrieval, Neo4j export" class="kg-screenshot">
+                <p class="diagram-caption">The full pipeline as an architecture diagram: five stages from raw corpus to Neo4j, with the no-embeddings retrieval path (lexical match &rarr; BFS/DFS traversal &rarr; token-budgeted serialization) along the bottom.</p>
                 <div class="pipeline-flow">
 <span class="stage">RAW CORPUS</span> (PDFs &middot; scanned images &middot; notes &middot; maps) <span class="arrow">&rarr;</span> <span class="stage">LLM EXTRACTION</span> (parallel subagents, vision for scans)<br>
 <span class="arrow">&rarr;</span> <span class="stage">ENTITY + RELATIONSHIP JSON</span> (every edge provenance-tagged) <span class="arrow">&rarr;</span> <span class="stage">GRAPH BUILD</span> (NetworkX)<br>

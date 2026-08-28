@@ -77,6 +77,8 @@
                 <p>The hard parts aren't the LLM. The hard parts are the things people skip in demos: (1) the model needs the <em>actual</em> schema, not a hand-written summary that drifts out of sync; (2) the model will absolutely write a <code>DELETE</code> if you don't physically stop it; (3) the response has to be parseable so my code can act on it &mdash; not a free-text essay; (4) when the LLM hallucinates a column name (and it will), the failure has to surface as a clean error message, not silent wrong data.</p>
 
                 <h2>System Architecture</h2>
+                <img src="../images/projects/sql-agent-mcp.png" alt="SQL Agent core loop and MCP server evolution — schema introspection, LLM SQL generation, safety gate, execution, and the MCP tool surface" class="kg-screenshot">
+                <p class="diagram-caption">The core loop (left): schema-aware prompting &rarr; LLM-generated SQL &rarr; a deterministic safety gate &rarr; execution. The MCP evolution (right): the same capabilities exposed as typed tools any MCP client can call, with the safety gate staying server-side.</p>
 
                 <p>Four components, each replaceable. The agent loop is deliberately boring &mdash; the intelligence lives in the prompt and the schema context, not in framework magic. The schema introspection runs once at startup and is re-rendered into the system prompt on every call, so the LLM never sees the warehouse directly &mdash; it sees a structured markdown view of it that <em>my code</em> generated from live metadata. If a column is added tomorrow, restart the agent and the new column shows up in the prompt with no code change.</p>
 
